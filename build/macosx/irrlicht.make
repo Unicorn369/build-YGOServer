@@ -26,7 +26,7 @@ ifeq ($(config),release)
   DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
   INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht -I../../irrlicht/source/Irrlicht/zlib
   FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch i386
+  OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-exceptions -fno-rtti -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
@@ -62,7 +62,7 @@ ifeq ($(config),debug)
   DEFINES += -D_DEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
   INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht -I../../irrlicht/source/Irrlicht/zlib
   FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch i386
+  OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -fno-exceptions -fno-rtti -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)

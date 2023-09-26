@@ -26,7 +26,7 @@ ifeq ($(config),release)
   DEFINES += -DNDEBUG -DLUA_USE_MACOSX
   INCLUDES +=
   FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch i386
+  OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -x c++ $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -x c++ $(OSX_CFLAGS)
@@ -62,7 +62,7 @@ ifeq ($(config),debug)
   DEFINES += -D_DEBUG -DLUA_USE_MACOSX
   INCLUDES +=
   FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch i386
+  OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -x c++ $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -x c++ $(OSX_CFLAGS)

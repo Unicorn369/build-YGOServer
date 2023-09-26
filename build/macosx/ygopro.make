@@ -26,7 +26,7 @@ ifeq ($(config),release)
   DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
   INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../irrlicht/include -I../../libevent/include -I../../libevent/macosx
   FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch i386
+  OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
