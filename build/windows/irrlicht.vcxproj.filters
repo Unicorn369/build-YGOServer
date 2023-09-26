@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="zlib">
+      <UniqueIdentifier>{16CFA17C-0206-A30D-ABF2-881097081F0F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CAttributes.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CFileList.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CFileSystem.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CLimitReadFile.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CMemoryFile.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CReadFile.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CWriteFile.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CXMLReader.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CXMLWriter.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\CZipReader.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\os.cpp" />
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\adler32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\crc32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\inffast.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\inflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\inftrees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\irrlicht\source\Irrlicht\zlib\zutil.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
