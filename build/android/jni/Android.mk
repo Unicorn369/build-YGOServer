@@ -14,7 +14,11 @@ LOCAL_YGOPRO    := -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPO
 LOCAL_CFLAGS    += $(LOCAL_YGOPRO) -fno-strict-aliasing -Wno-multichar -Wno-format-security -fno-rtti
 LOCAL_CXXFLAGS  := -std=c++14
 
-LOCAL_MODULE_FILENAME := ygopro
+LOCAL_MODULE_FILENAME := "libYGOPro.so"
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_MODULE_FILENAME := "libYGOPro64.so"
+endif
+
 LOCAL_SRC_FILES := \
     gframe/lzma/Alloc.c \
     gframe/lzma/LzFind.c \
