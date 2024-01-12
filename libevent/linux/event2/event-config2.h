@@ -24,9 +24,7 @@
 /* #undef EVENT__DISABLE_THREAD_SUPPORT */
 
 /* Define to 1 if you have the `accept4' function. */
-#if __ANDROID_API__ >= 21
 #define EVENT__HAVE_ACCEPT4 1
-#endif
 
 /* Define to 1 if you have the `arc4random' function. */
 #define EVENT__HAVE_ARC4RANDOM 1
@@ -69,9 +67,7 @@
 #define EVENT__HAVE_EPOLL 1
 
 /* Define to 1 if you have the `epoll_create1' function. */
-#if __ANDROID_API__ >= 21
 #define EVENT__HAVE_EPOLL_CREATE1 1
-#endif
 
 /* Define to 1 if you have the `epoll_ctl' function. */
 #define EVENT__HAVE_EPOLL_CTL 1
@@ -170,7 +166,7 @@
 #define EVENT__HAVE_NETDB_H 1
 
 /* Define to 1 if you have the <netinet/in6.h> header file. */
-#define EVENT__HAVE_NETINET_IN6_H 1
+/* #undef EVENT__HAVE_NETINET_IN6_H */
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #define EVENT__HAVE_NETINET_IN_H 1
@@ -233,14 +229,10 @@
 #define EVENT__HAVE_SIGACTION 1
 
 /* Define to 1 if you have the `signal' function. */
-#if __ANDROID_API__ >= 21
 #define EVENT__HAVE_SIGNAL 1
-#endif
 
 /* Define to 1 if you have the `splice' function. */
-#if __ANDROID_API__ >= 21
 #define EVENT__HAVE_SPLICE 1
-#endif
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define EVENT__HAVE_STDARG_H 1
@@ -261,7 +253,7 @@
 #define EVENT__HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strlcpy' function. */
-#define EVENT__HAVE_STRLCPY 1
+/* #undef EVENT__HAVE_STRLCPY */
 
 /* Define to 1 if you have the `strsep' function. */
 #define EVENT__HAVE_STRSEP 1
@@ -384,9 +376,7 @@
 #define EVENT__HAVE_TIMERCMP 1
 
 /* Define to 1 if you have the `timerfd_create' function. */
-#if __ANDROID_API__ >= 21
 #define EVENT__HAVE_TIMERFD_CREATE 1
-#endif
 
 /* Define if timerisset is defined in <sys/time.h> */
 #define EVENT__HAVE_TIMERISSET 1
