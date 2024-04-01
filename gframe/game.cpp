@@ -827,7 +827,7 @@ bool Game::Initialize() {
 	btnCategoryOK = env->addButton(rect<s32>(150, 210, 250, 235), wCategories, BUTTON_CATEGORY_OK, dataManager.GetSysString(1211));
 	int catewidth = 0;
 	for(int i = 0; i < 32; ++i) {
-		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(dataManager.GetSysString(1100 + i));
+		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(dataManager.GetSysString(1100 + i));
 		if((int)dtxt.Width + 40 > catewidth)
 			catewidth = dtxt.Width + 40;
 	}
@@ -1581,36 +1581,45 @@ void Game::SaveConfig() {
 void Game::ShowCardInfo(int code, bool resize) {
 	if(showingcode == code && !resize)
 		return;
-	CardData cd;
 	wchar_t formatBuffer[256];
-	dataManager.GetData(code, &cd);
+	auto cit = dataManager.GetCodePointer(code);
+	bool is_valid = (cit != dataManager.datas_end);
 	imgCard->setImage(imageManager.GetTexture(code, true));
-	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
-		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
-	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+	if (is_valid) {
+		auto& cd = cit->second;
+		if (cd.is_alternative())
+			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
+		else
+			myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+	}
+	else {
+		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
+	}
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!gameConf.hide_setname) {
-		unsigned long long sc = cd.setcode;
-		if(cd.alias) {
-			auto aptr = dataManager.GetCodePointer(cd.alias);
-			if(aptr != dataManager.datas_end)
-				sc = aptr->second.setcode;
+	if (is_valid && !gameConf.hide_setname) {
+		auto& cd = cit->second;
+		auto target = cit;
+		if (cd.alias && dataManager.GetCodePointer(cd.alias) != dataManager.datas_end) {
+			target = dataManager.GetCodePointer(cd.alias);
 		}
-		if(sc) {
+		if (target->second.setcode[0]) {
 			offset = 23;// *yScale;
-			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
+			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(target->second.setcode));
 			stSetName->setText(formatBuffer);
-		} else
+		}
+		else
 			stSetName->setText(L"");
-	} else {
+	}
+	else {
 		stSetName->setText(L"");
 	}
-	if(cd.type & TYPE_MONSTER) {
+	if(is_valid && cit->second.type & TYPE_MONSTER) {
+		auto& cd = cit->second;
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		int offset_info = 0;
-		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(formatBuffer);
+		irr::core::dimension2d<unsigned int> dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_info = 15;
 		if(!(cd.type & TYPE_LINK)) {
@@ -1644,7 +1653,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		}
 		stDataInfo->setText(formatBuffer);
 		int offset_arrows = offset_info;
-		dtxt = mainGame->guiFont->getDimension(formatBuffer);
+		dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_arrows += 15;
 		stInfo->setRelativePosition(rect<s32>(15, 37, 300 * xScale - 13, (60 + offset_info)));
@@ -1652,8 +1661,12 @@ void Game::ShowCardInfo(int code, bool resize) {
 		stSetName->setRelativePosition(rect<s32>(15, (83 + offset_arrows), 296 * xScale, (83 + offset_arrows) + offset));
 		stText->setRelativePosition(rect<s32>(15, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
 		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
-	} else {
-		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
+	}
+	else {
+		if (is_valid)
+			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cit->second.type));
+		else
+			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(0));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 60 + offset));
@@ -1976,8 +1989,8 @@ void Game::OnResize() {
 		scrTabSystem->setVisible(false);
 
 	if(gameConf.resize_popup_menu) {
-		int width = 100 * mainGame->xScale;
-		int height = (mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
+		int width = 100 * xScale;
+		int height = (yScale >= 0.666) ? 21 * yScale : 14;
 		wCmdMenu->setRelativePosition(recti(1, 1, width + 1, 1));
 		btnActivate->setRelativePosition(recti(1, 1, width, height));
 		btnSummon->setRelativePosition(recti(1, 1, width, height));
@@ -2157,7 +2170,7 @@ void Game::FlashWindow() {
 #endif
 }
 void Game::SetCursor(ECURSOR_ICON icon) {
-	ICursorControl* cursor = mainGame->device->getCursorControl();
+	ICursorControl* cursor = device->getCursorControl();
 	if(cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
