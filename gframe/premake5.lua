@@ -42,10 +42,20 @@ end
     end
 
     if BUILD_EVENT then
-        includedirs { "../event/include" }
+        includedirs { "../libevent/include" }
+        if os.istarget("macosx") then
+            includedirs { "../libevent/macosx" }
+        elseif os.istarget("linux") then
+            includedirs { "../libevent/linux" }
+        elseif os.istarget("windows") then
+            includedirs { "../libevent/Win32" }
+        end
     else
         includedirs { EVENT_INCLUDE_DIR }
         libdirs { EVENT_LIB_DIR }
+        --if os.istarget("windows") then
+        --    links { "Bcrypt", "Iphlpapi" }
+        --end
     end
 
     if BUILD_IRRLICHT then

@@ -15,9 +15,9 @@ LOCAL_CFLAGS    += $(LOCAL_YGOPRO) -fno-strict-aliasing -Wno-multichar -Wno-form
 LOCAL_CXXFLAGS  := -std=c++14
 
 LOCAL_MODULE_FILENAME := "libYGOPro.so"
-ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-LOCAL_MODULE_FILENAME := "libYGOPro64.so"
-endif
+#ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+#LOCAL_MODULE_FILENAME := "libYGOPro64.so"
+#endif
 
 LOCAL_SRC_FILES := \
     gframe/lzma/Alloc.c \
