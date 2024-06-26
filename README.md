@@ -22,3 +22,10 @@ x86_64
 x86
 x86_64
 ` 
+
+# 编译说明
+编译请参考`build/build.bat`或`build/build.sh`
+
+对于某些`Linux平台`需改用`libevent/linux/event2/event-config2.h`否则程序无法正常运行
+
+交叉编译`macOS平台`请使用[osxcross](https://github.com/tpoechtrager/osxcross)
