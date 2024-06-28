@@ -40,5 +40,6 @@ LOCAL_SRC_FILES := \
     lzio.c
 
 LOCAL_CFLAGS    := -DLUA_USE_LINUX -x c++
+#LOCAL_CFLAGS    := -DLUA_USE_POSIX -O2 -Wall -D"getlocaledecpoint()='.'" -fexceptions
 #LOCAL_CPP_EXTENSION := .c
 include $(BUILD_STATIC_LIBRARY)
