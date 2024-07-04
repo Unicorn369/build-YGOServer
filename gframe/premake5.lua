@@ -92,6 +92,7 @@ end
     filter "not system:windows"
         links { "event_pthreads", "dl", "pthread" }
     filter "system:macosx"
+        linkoptions  { "-arch x86_64", "-arch arm64" }
 if not SERVER_MODE then
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }
