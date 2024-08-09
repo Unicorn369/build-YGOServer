@@ -31,7 +31,7 @@ typedef signed char int8;
 #define TRUE 1
 #define FALSE 0
 #define SIZE_MESSAGE_BUFFER 0x2000
-#define SIZE_RETURN_VALUE 128
+#define SIZE_RETURN_VALUE 512
 
 #define PROCESSOR_BUFFER_LEN	0x0fffffff
 #define PROCESSOR_FLAG			0xf0000000
@@ -43,7 +43,9 @@ typedef signed char int8;
 #define NULL 0
 #endif
 
-#define CURRENT_RULE	5
+#define NEW_MASTER_RULE		4	//New Master Rule (2017)
+#define MASTER_RULE_2020	5	//Master Rule 2020
+#define CURRENT_RULE		5
 
 //Locations
 #define LOCATION_DECK		0x01		//
@@ -107,6 +109,8 @@ typedef signed char int8;
 #define TYPE_PENDULUM		0x1000000	//
 #define TYPE_SPSUMMON		0x2000000	//
 #define TYPE_LINK			0x4000000	//
+
+#define TYPES_EXTRA_DECK	(TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)
 
 //Attributes
 #define ATTRIBUTE_ALL		0x7f		//
