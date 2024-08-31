@@ -64,7 +64,7 @@ extern "C" DECL_DLLEXPORT intptr_t create_duel(uint_fast32_t seed) {
 	pduel->random.reset(seed);
 	return (intptr_t)pduel;
 }
-extern "C" DECL_DLLEXPORT void start_duel(intptr_t pduel, int32 options) {
+extern "C" DECL_DLLEXPORT void start_duel(intptr_t pduel, uint32 options) {
 	duel* pd = (duel*)pduel;
 	pd->game_field->core.duel_options |= options & 0xffff;
 	int32 duel_rule = options >> 16;
@@ -72,8 +72,12 @@ extern "C" DECL_DLLEXPORT void start_duel(intptr_t pduel, int32 options) {
 		pd->game_field->core.duel_rule = duel_rule;
 	else if(options & DUEL_OBSOLETE_RULING)		//provide backward compatibility with replay
 		pd->game_field->core.duel_rule = 1;
-	else if(!pd->game_field->core.duel_rule)
+	if (pd->game_field->core.duel_rule < 1 || pd->game_field->core.duel_rule > CURRENT_RULE)
 		pd->game_field->core.duel_rule = CURRENT_RULE;
+	if (pd->game_field->core.duel_rule == MASTER_RULE3) {
+		pd->game_field->player[0].szone_size = 8;
+		pd->game_field->player[1].szone_size = 8;
+	}
 	pd->game_field->core.shuffle_hand_check[0] = FALSE;
 	pd->game_field->core.shuffle_hand_check[1] = FALSE;
 	pd->game_field->core.shuffle_deck_check[0] = FALSE;
@@ -112,6 +116,8 @@ extern "C" DECL_DLLEXPORT void end_duel(intptr_t pduel) {
 	}
 }
 extern "C" DECL_DLLEXPORT void set_player_info(intptr_t pduel, int32 playerid, int32 lp, int32 startcount, int32 drawcount) {
+	if (!check_playerid(playerid))
+		return;
 	duel* pd = (duel*)pduel;
 	if(lp > 0)
 		pd->game_field->player[playerid].lp = lp;
@@ -137,6 +143,8 @@ extern "C" DECL_DLLEXPORT uint32 process(intptr_t pduel) {
 	return result;
 }
 extern "C" DECL_DLLEXPORT void new_card(intptr_t pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position) {
+	if (!check_playerid(owner) || !check_playerid(playerid))
+		return;
 	duel* ptduel = (duel*)pduel;
 	if(ptduel->game_field->is_location_useable(playerid, location, sequence)) {
 		card* pcard = ptduel->new_card(code);
@@ -177,7 +185,7 @@ extern "C" DECL_DLLEXPORT void new_tag_card(intptr_t pduel, uint32 code, uint8 o
 	}
 }
 extern "C" DECL_DLLEXPORT int32 query_card(intptr_t pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache) {
-	if(playerid != 0 && playerid != 1)
+	if (!check_playerid(playerid))
 		return LEN_FAIL;
 	duel* ptduel = (duel*)pduel;
 	card* pcard = nullptr;
@@ -185,7 +193,7 @@ extern "C" DECL_DLLEXPORT int32 query_card(intptr_t pduel, uint8 playerid, uint8
 	if(location & LOCATION_ONFIELD)
 		pcard = ptduel->game_field->get_field_card(playerid, location, sequence);
 	else {
-		field::card_vector* lst = nullptr;
+		card_vector* lst = nullptr;
 		if (location == LOCATION_HAND)
 			lst = &ptduel->game_field->player[playerid].list_hand;
 		else if (location == LOCATION_GRAVE)
@@ -213,7 +221,7 @@ extern "C" DECL_DLLEXPORT int32 query_card(intptr_t pduel, uint8 playerid, uint8
 }
 extern "C" DECL_DLLEXPORT int32 query_field_count(intptr_t pduel, uint8 playerid, uint8 location) {
 	duel* ptduel = (duel*)pduel;
-	if(playerid != 0 && playerid != 1)
+	if (!check_playerid(playerid))
 		return 0;
 	auto& player = ptduel->game_field->player[playerid];
 	if(location == LOCATION_HAND)
@@ -243,7 +251,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_count(intptr_t pduel, uint8 playerid
 	return 0;
 }
 extern "C" DECL_DLLEXPORT int32 query_field_card(intptr_t pduel, uint8 playerid, uint8 location, uint32 query_flag, byte* buf, int32 use_cache) {
-	if(playerid != 0 && playerid != 1)
+	if (!check_playerid(playerid))
 		return LEN_FAIL;
 	duel* ptduel = (duel*)pduel;
 	auto& player = ptduel->game_field->player[playerid];
@@ -269,7 +277,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_card(intptr_t pduel, uint8 playerid,
 		}
 	}
 	else {
-		field::card_vector* lst = nullptr;
+		card_vector* lst = nullptr;
 		if(location == LOCATION_HAND)
 			lst = &player.list_hand;
 		else if(location == LOCATION_GRAVE)
@@ -293,7 +301,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_info(intptr_t pduel, byte* buf) {
 	duel* ptduel = (duel*)pduel;
 	byte* p = buf;
 	*p++ = MSG_RELOAD_FIELD;
-	*p++ = ptduel->game_field->core.duel_rule;
+	*p++ = (uint8)ptduel->game_field->core.duel_rule;
 	for(int playerid = 0; playerid < 2; ++playerid) {
 		auto& player = ptduel->game_field->player[playerid];
 		buffer_write<int32_t>(p, player.lp);

@@ -43,7 +43,10 @@ typedef signed char int8;
 #define NULL 0
 #endif
 
-#define CURRENT_RULE	5	//current rule: 5, Master Rule 2020
+#define MASTER_RULE3		3	//Master Rule 3 (2014)
+#define NEW_MASTER_RULE		4	//New Master Rule (2017)
+#define MASTER_RULE_2020	5	//Master Rule 2020
+#define CURRENT_RULE		5
 
 //Locations
 #define LOCATION_DECK		0x01		//
@@ -107,6 +110,8 @@ typedef signed char int8;
 #define TYPE_PENDULUM		0x1000000	//
 #define TYPE_SPSUMMON		0x2000000	//
 #define TYPE_LINK			0x4000000	//
+
+#define TYPES_EXTRA_DECK	(TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)
 
 //Attributes
 #define ATTRIBUTE_ALL		0x7f		//
@@ -414,6 +419,7 @@ typedef signed char int8;
 #define DUEL_TAG_MODE			0x20
 #define DUEL_SIMPLE_AI			0x40
 #define DUEL_RETURN_DECK_TOP	0x80
+#define DUEL_REVEAL_DECK_SEQ	0x100
 
 //Activity
 #define ACTIVITY_SUMMON			1
