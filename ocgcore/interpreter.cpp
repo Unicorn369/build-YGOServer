@@ -160,6 +160,19 @@ int32 interpreter::load_card_script(uint32 code) {
 		lua_pushstring(current_state, "__index");	//+1 "__index", table cxxx
 		lua_pushvalue(current_state, -2);			//+1 table cxxx, "__index", table cxxx
 		lua_rawset(current_state, -3);				//-2 table cxxx
+		#ifdef YGOPRO_PRO2_SUPPORT
+		lua_getglobal(current_state, class_name);	//+1
+		lua_setglobal(current_state, "self_table");	//-1
+		lua_pushinteger(current_state, code);		//+1
+		lua_setglobal(current_state, "self_code");	//-1
+		char script_name[64];
+		sprintf(script_name, "./script/c%d.lua", code);
+		int32 res = load_script(script_name);
+		lua_pushnil(current_state);					//+1
+		lua_setglobal(current_state, "self_table"); //-1
+		lua_pushnil(current_state);					//+1
+		lua_setglobal(current_state, "self_code");	//-1 table cxxx {__index: cxxx }
+		#else
 		card_data cdata;
 		int32 res = OPERATION_SUCCESS;
 		::read_card(code, &cdata);
@@ -176,6 +189,7 @@ int32 interpreter::load_card_script(uint32 code) {
 			lua_pushnil(current_state);					//+1
 			lua_setglobal(current_state, "self_code");	//-1 table cxxx {__index: cxxx }
 		}
+		#endif
 		if(!res) {
 			return OPERATION_FAIL;
 		}

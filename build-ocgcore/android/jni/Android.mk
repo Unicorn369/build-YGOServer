@@ -33,6 +33,7 @@ LOCAL_SRC_FILES := ocgcore/card.cpp \
                    ocgcore/processor.cpp \
                    ocgcore/scriptlib.cpp
 
+LOCAL_CFLAGS += -DYGOPRO_PRO2_SUPPORT
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/lua
 LOCAL_STATIC_LIBRARIES += liblua5.4
 

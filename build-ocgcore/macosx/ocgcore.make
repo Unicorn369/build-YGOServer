@@ -23,7 +23,7 @@ ifeq ($(config),release)
   TARGETDIR = bin/Release
   TARGET = $(TARGETDIR)/ocgcore.bundle
   OBJDIR = obj/Release/ocgcore
-  DEFINES +=
+  DEFINES += -DYGOPRO_PRO2_SUPPORT
   INCLUDES += -I../../lua
   OSX_CFLAGS = -mmacosx-version-min=10.9 -arch x86_64
   #OSX_CFLAGS = -mmacosx-version-min=10.9 -arch i386 -arch x86_64
@@ -60,7 +60,7 @@ ifeq ($(config),debug)
   TARGETDIR = bin/Debug
   TARGET = $(TARGETDIR)/ocgcore.bundle
   OBJDIR = obj/Debug/ocgcore
-  DEFINES += -D_DEBUG
+  DEFINES += -D_DEBUG -DYGOPRO_PRO2_SUPPORT
   INCLUDES += -I../../lua
   OSX_CFLAGS = -mmacosx-version-min=10.9-arch x86_64
   #OSX_CFLAGS = -mmacosx-version-min=10.9 -arch i386 -arch x86_64
