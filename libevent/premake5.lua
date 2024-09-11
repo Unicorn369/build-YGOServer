@@ -23,6 +23,10 @@ project "event"
         includedirs { "android" }
         files { "evthread_pthread.c", "epoll.c", "poll.c", "select.c", "strlcpy.c" }
 
+    filter "system:bsd"
+        includedirs { "bsd" }
+        files { "evthread_pthread.c", "poll.c", "kqueue.c", "select.c" }
+
     filter "system:linux"
         includedirs { "linux" }
         files { "evthread_pthread.c", "epoll.c", "poll.c", "select.c", "strlcpy.c" }

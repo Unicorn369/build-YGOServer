@@ -37,7 +37,9 @@ end
 
     if BUILD_EVENT then
         includedirs { "../libevent/include" }
-        if os.istarget("macosx") then
+        if os.istarget("bsd") then
+            includedirs { "../libevent/bsd" }
+        elseif os.istarget("macosx") then
             includedirs { "../libevent/macosx" }
         elseif os.istarget("linux") then
             includedirs { "../libevent/linux" }
