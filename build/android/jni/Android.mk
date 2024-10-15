@@ -45,7 +45,7 @@ ifeq ($(USR_SHARED),false)
 LOCAL_STATIC_LIBRARIES += libocgcore
 LOCAL_STATIC_LIBRARIES += libsqlite3
 else
-LOCAL_LDFLAGS := -Wl,-rpath,`cat jni/LDFLAGS.txt`
+LOCAL_LDFLAGS := @jni/LDFLAGS.txt
 LOCAL_SHARED_LIBRARIES += libocgcore
 LOCAL_SHARED_LIBRARIES += libsqlite3
 endif
