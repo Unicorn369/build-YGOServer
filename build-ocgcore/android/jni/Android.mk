@@ -1,15 +1,5 @@
 LOCAL_PATH := $(call my-dir)/../../..
 
-######### [sqlite3] ##########
-#include $(CLEAR_VARS)
-#LOCAL_MODULE := sqlite3
-#LOCAL_SRC_FILES := sqlite3/sqlite3.c
-#include $(BUILD_SHARED_LIBRARY)
-##############################
-
-
-
-######### [ocgcore] ##########
 include $(CLEAR_VARS)
 LOCAL_MODULE := ocgcore
 TARGET_FORMAT_STRING_CFLAGS := 
@@ -39,4 +29,3 @@ LOCAL_STATIC_LIBRARIES += liblua5.4
 
 include $(BUILD_SHARED_LIBRARY)
 include $(LOCAL_PATH)/lua/Android.mk
-##############################

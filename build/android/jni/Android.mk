@@ -1,5 +1,7 @@
 LOCAL_PATH := $(call my-dir)/../../..
-
+#################################
+USR_SHARED ?= false
+#################################
 include $(CLEAR_VARS)
 LOCAL_MODULE := ygopro
 TARGET_FORMAT_STRING_CFLAGS := 
@@ -35,35 +37,23 @@ LOCAL_SRC_FILES := \
     gframe/replay.cpp \
     gframe/netserver.cpp \
     gframe/single_duel.cpp \
-    gframe/tag_duel.cpp \
-    \
-    ocgcore/card.cpp \
-    ocgcore/duel.cpp \
-    ocgcore/effect.cpp \
-    ocgcore/field.cpp \
-    ocgcore/group.cpp \
-    ocgcore/interpreter.cpp \
-    ocgcore/libcard.cpp \
-    ocgcore/libdebug.cpp \
-    ocgcore/libduel.cpp \
-    ocgcore/libeffect.cpp \
-    ocgcore/libgroup.cpp \
-    ocgcore/mem.cpp \
-    ocgcore/ocgapi.cpp \
-    ocgcore/operations.cpp \
-    ocgcore/playerop.cpp \
-    ocgcore/processor.cpp \
-    ocgcore/scriptlib.cpp
+    gframe/tag_duel.cpp
 
 LOCAL_STATIC_LIBRARIES += irrlicht
 LOCAL_STATIC_LIBRARIES += libevent2_core
-LOCAL_STATIC_LIBRARIES += liblua5.4
+ifeq ($(USR_SHARED),false)
+LOCAL_STATIC_LIBRARIES += libocgcore
 LOCAL_STATIC_LIBRARIES += libsqlite3
+else
+LOCAL_LDFLAGS := -Wl,-rpath,`cat jni/LDFLAGS.txt`
+LOCAL_SHARED_LIBRARIES += libocgcore
+LOCAL_SHARED_LIBRARIES += libsqlite3
+endif
 
 include $(BUILD_EXECUTABLE)
 ##############################
 $(call import-add-path,$(LOCAL_PATH))
 $(call import-module,irrlicht)
 $(call import-module,libevent)
-$(call import-module,lua)
+$(call import-module,ocgcore)
 $(call import-module,sqlite3)

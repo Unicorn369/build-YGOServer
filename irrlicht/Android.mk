@@ -6,16 +6,9 @@ LOCAL_MODULE    := irrlicht
 
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/include \
-    $(LOCAL_PATH)/source/Irrlicht \
-    $(LOCAL_PATH)/source/Irrlicht/zlib
+    $(LOCAL_PATH)/source/Irrlicht
 
 LOCAL_SRC_FILES := \
-    source/Irrlicht/zlib/adler32.c \
-    source/Irrlicht/zlib/crc32.c \
-    source/Irrlicht/zlib/inffast.c \
-    source/Irrlicht/zlib/inflate.c \
-    source/Irrlicht/zlib/inftrees.c \
-    source/Irrlicht/zlib/zutil.c \
     source/Irrlicht/os.cpp \
     source/Irrlicht/CAttributes.cpp \
     source/Irrlicht/CFileList.cpp \
@@ -29,7 +22,8 @@ LOCAL_SRC_FILES := \
     source/Irrlicht/CZipReader.cpp
 
 LOCAL_CXXFLAGS := -std=gnu++11
-LOCAL_CFLAGS := -D_IRR_ANDROID_PLATFORM_ -Wall -pipe -fno-exceptions -fno-rtti -fstrict-aliasing
+LOCAL_CFLAGS := -D_IRR_ANDROID_PLATFORM_ -D_IRR_USE_NON_SYSTEM_ZLIB_ -Wall -pipe -fno-exceptions -fno-rtti -fstrict-aliasing
+LOCAL_EXPORT_LDLIBS := -lz
 LOCAL_CFLAGS += \
     -D_IRR_STATIC_LIB_ \
     -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ \
