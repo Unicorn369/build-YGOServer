@@ -1,6 +1,7 @@
 LOCAL_PATH := $(call my-dir)/../../..
 #################################
-USR_SHARED ?= false
+#USR_SHARED ?= false
+USR_SHARED ?= true
 #################################
 include $(CLEAR_VARS)
 LOCAL_MODULE := ygopro

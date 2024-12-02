@@ -15,13 +15,14 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libevent2_core
 LOCAL_STATIC_LIBRARIES := libevent2_pthreads
 
-LOCAL_SRC_FILES := epoll.c \
+LOCAL_SRC_FILES := \
     buffer.c \
     bufferevent.c \
     bufferevent_filter.c \
     bufferevent_pair.c \
     bufferevent_ratelim.c \
     bufferevent_sock.c \
+    epoll.c \
     event.c \
     evmap.c \
     evthread.c \
@@ -33,12 +34,12 @@ LOCAL_SRC_FILES := epoll.c \
     signal.c \
     strlcpy.c \
     select.c \
-    poll.c \
-    
+    poll.c
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH) \
-    				$(LOCAL_PATH)/android \
-   					$(LOCAL_PATH)/include \
+LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH) \
+    $(LOCAL_PATH)/android \
+    $(LOCAL_PATH)/include
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 
@@ -59,6 +60,7 @@ LOCAL_SRC_FILES := \
     bufferevent_pair.c \
     bufferevent_ratelim.c \
     bufferevent_sock.c \
+    epoll.c \
     event.c \
     evmap.c \
     evthread.c \
@@ -71,17 +73,17 @@ LOCAL_SRC_FILES := \
     strlcpy.c \
     select.c \
     poll.c \
-    epoll.c \
+    \
     event_tagging.c \
     http.c \
     evdns.c \
     evrpc.c
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH) \
-    				$(LOCAL_PATH)/android \
-   					$(LOCAL_PATH)/include \
+LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH) \
+    $(LOCAL_PATH)/android \
+    $(LOCAL_PATH)/include
 
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/android
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 
 include $(BUILD_STATIC_LIBRARY)

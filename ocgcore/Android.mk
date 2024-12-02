@@ -5,23 +5,24 @@ LOCAL_MODULE := ocgcore
 TARGET_FORMAT_STRING_CFLAGS := 
 
 LOCAL_MODULE_FILENAME := libocgcore
-LOCAL_SRC_FILES := card.cpp \
-                   duel.cpp \
-                   effect.cpp \
-                   field.cpp \
-                   group.cpp \
-                   interpreter.cpp \
-                   libcard.cpp \
-                   libdebug.cpp \
-                   libduel.cpp \
-                   libeffect.cpp \
-                   libgroup.cpp \
-                   mem.cpp \
-                   ocgapi.cpp \
-                   operations.cpp \
-                   playerop.cpp \
-                   processor.cpp \
-                   scriptlib.cpp
+LOCAL_SRC_FILES := \
+    card.cpp \
+    duel.cpp \
+    effect.cpp \
+    field.cpp \
+    group.cpp \
+    interpreter.cpp \
+    libcard.cpp \
+    libdebug.cpp \
+    libduel.cpp \
+    libeffect.cpp \
+    libgroup.cpp \
+    mem.cpp \
+    ocgapi.cpp \
+    operations.cpp \
+    playerop.cpp \
+    processor.cpp \
+    scriptlib.cpp
 
 LOCAL_CFLAGS += -DYGOPRO_PRO2_SUPPORT
 
