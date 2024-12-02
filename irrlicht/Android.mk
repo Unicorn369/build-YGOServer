@@ -8,6 +8,8 @@ LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/include \
     $(LOCAL_PATH)/source/Irrlicht
 
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+
 LOCAL_SRC_FILES := \
     source/Irrlicht/os.cpp \
     source/Irrlicht/CAttributes.cpp \

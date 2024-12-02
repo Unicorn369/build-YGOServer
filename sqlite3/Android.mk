@@ -8,8 +8,10 @@ LOCAL_MODULE_FILENAME := libsqlite3
 
 LOCAL_SRC_FILES := sqlite3.c 
 
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+
 ifeq ($(USR_SHARED),false)
-include $(BUILD_STATIC_LIBRARY)
+    include $(BUILD_STATIC_LIBRARY)
 else
-include $(BUILD_SHARED_LIBRARY)
+    include $(BUILD_SHARED_LIBRARY)
 endif

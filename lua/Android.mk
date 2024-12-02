@@ -39,6 +39,8 @@ LOCAL_SRC_FILES := \
     lvm.c \
     lzio.c
 
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+
 LOCAL_CFLAGS    := -DLUA_USE_LINUX -x c++
 #LOCAL_CFLAGS    := -DLUA_USE_POSIX -O2 -Wall -D"getlocaledecpoint()='.'" -fexceptions
 #LOCAL_CPP_EXTENSION := .c

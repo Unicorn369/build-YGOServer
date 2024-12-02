@@ -6,14 +6,10 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := ygopro
 TARGET_FORMAT_STRING_CFLAGS := 
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/irrlicht/source/Irrlicht
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/irrlicht/include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/libevent/include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/lua
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/sqlite3
+#LOCAL_C_INCLUDES := $(LOCAL_PATH)/gframe
 
 LOCAL_YGOPRO    := -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-LOCAL_CFLAGS    += $(LOCAL_YGOPRO) -fno-strict-aliasing -Wno-multichar -Wno-format-security -fno-rtti
+LOCAL_CFLAGS    := $(LOCAL_YGOPRO) -fno-strict-aliasing -Wno-multichar -Wno-format-security -fno-rtti
 LOCAL_CXXFLAGS  := -std=c++14
 
 LOCAL_MODULE_FILENAME := "libYGOPro.so"
@@ -41,13 +37,14 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES += irrlicht
 LOCAL_STATIC_LIBRARIES += libevent2_core
+
 ifeq ($(USR_SHARED),false)
-LOCAL_STATIC_LIBRARIES += libocgcore
-LOCAL_STATIC_LIBRARIES += libsqlite3
+    LOCAL_STATIC_LIBRARIES += libocgcore
+    LOCAL_STATIC_LIBRARIES += libsqlite3
 else
-LOCAL_LDFLAGS := @jni/LDFLAGS.txt
-LOCAL_SHARED_LIBRARIES += libocgcore
-LOCAL_SHARED_LIBRARIES += libsqlite3
+    LOCAL_LDFLAGS := @jni/LDFLAGS.txt
+    LOCAL_SHARED_LIBRARIES += libocgcore
+    LOCAL_SHARED_LIBRARIES += libsqlite3
 endif
 
 include $(BUILD_EXECUTABLE)
