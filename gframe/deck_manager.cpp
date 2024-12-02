@@ -191,7 +191,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_p
 }
 int DeckManager::LoadDeck(Deck& deck, std::istringstream& deckStream, bool is_packlist) {
 	int ct = 0, mainc = 0, sidec = 0, code = 0;
-	int cardlist[300]{};
+	int cardlist[PACK_MAX_SIZE]{};
 	bool is_side = false;
 	std::string linebuf;
 	while (std::getline(deckStream, linebuf, '\n') && ct < (int)(sizeof cardlist / sizeof cardlist[0])) {
@@ -247,7 +247,7 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 		myswprintf(catepath, L"./pack");
 		break;
 	case 1:
-		myswprintf(catepath, mainGame->gameConf.bot_deck_path);
+		BufferIO::CopyWideString(mainGame->gameConf.bot_deck_path, catepath);
 		break;
 	case -1:
 	case 2:
@@ -273,15 +273,9 @@ void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, 
 	}
 }
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
-#ifdef WIN32
-	wchar_t wmode[20]{};
-	BufferIO::CopyWStr(mode, wmode, sizeof wmode / sizeof wmode[0]);
-	FILE* fp = _wfopen(file, wmode);
-#else
-	char file2[256];
-	BufferIO::EncodeUTF8(file, file2);
-	FILE* fp = fopen(file2, mode);
-#endif
+	char fullname[256]{};
+	BufferIO::EncodeUTF8(file, fullname);
+	FILE* fp = myfopen(fullname, mode);
 	return fp;
 }
 IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
@@ -314,7 +308,7 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 		reader->drop();
 		return false;
 	}
-	memset(deckBuffer, 0, sizeof(deckBuffer));
+	std::memset(deckBuffer, 0, sizeof deckBuffer);
 	reader->read(deckBuffer, size);
 	reader->drop();
 	std::istringstream deckStream(deckBuffer);

@@ -553,7 +553,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	set_message_handler(TagDuel::MessageHandler);
 	pduel = create_duel(duel_seed);
 #ifdef YGOPRO_SERVER_MODE
-	preload_script(pduel, "./script/special.lua", 0);
+	preload_script(pduel, "./script/special.lua");
 #endif
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
@@ -2080,7 +2080,7 @@ if(!dp || dp == players[pid])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -2133,7 +2133,7 @@ if(!dp || dp == players[pid])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if (position & POS_FACEDOWN)
-			memset(qbuf, 0, clen - 4);
+			std::memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
@@ -2181,7 +2181,7 @@ if(!dp || dp == cur_player[player])
 			continue;
 		auto position = GetPosition(qbuf, 8);
 		if(!(position & POS_FACEUP))
-			memset(qbuf, 0, slen - 4);
+			std::memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 	}
 	for(int i = 0; i < 4; ++i)
