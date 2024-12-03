@@ -14,8 +14,8 @@
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
-#define mywcsncasecmp wcsncasecmp
-#define mystrncasecmp strncasecmp
+#define mywcsncasecmp wcsnicmp
+#define mystrncasecmp strnicmp
 #endif
 
 #define socklen_t int
