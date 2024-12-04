@@ -32,6 +32,7 @@ end
         end
     end
     if SERVER_PRO2_SUPPORT then
+        targetname ("AI.Server")
         defines { "SERVER_PRO2_SUPPORT" }
     end
 
@@ -80,9 +81,6 @@ end
         files "ygopro.rc"
 if not SERVER_MODE then
         libdirs { "$(DXSDK_DIR)Lib/x86" }
-end
-if SERVER_PRO2_SUPPORT then
-        targetname ("AI.Server")
 end
 if SERVER_MODE then
         links { "ws2_32" }

@@ -8,6 +8,10 @@ ifndef verbose
   SILENT = @
 endif
 
+ifndef STRIP
+  STRIP = strip
+endif
+
 .PHONY: clean prebuild prelink
 
 ifeq ($(config),release)
@@ -87,6 +91,7 @@ $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR
 	@echo Linking ygopro
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
+	$(SILENT) $(STRIP) $(TARGET)
 
 $(CUSTOMFILES): | $(OBJDIR)
 

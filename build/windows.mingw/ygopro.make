@@ -8,6 +8,13 @@ ifndef verbose
   SILENT = @
 endif
 
+ifndef STRIP
+  STRIP = strip
+endif
+ifndef RESCOMP
+  RESCOMP = windres
+endif
+
 .PHONY: clean prebuild prelink
 
 ifeq ($(config),release)
@@ -20,7 +27,6 @@ ifeq ($(config),release)
   ifeq ($(origin AR), default)
     AR = ar
   endif
-  RESCOMP = windres
   TARGETDIR = bin/release
   TARGET = $(TARGETDIR)/AI.Server.exe
   OBJDIR = obj/Release/ygopro
@@ -56,7 +62,6 @@ ifeq ($(config),debug)
   ifeq ($(origin AR), default)
     AR = ar
   endif
-  RESCOMP = windres
   TARGETDIR = bin/debug
   TARGET = $(TARGETDIR)/AI.Server.exe
   OBJDIR = obj/Debug/ygopro
@@ -106,6 +111,7 @@ $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR
 	@echo Linking ygopro
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
+	$(SILENT) $(STRIP) $(TARGET)
 
 $(CUSTOMFILES): | $(OBJDIR)
 
