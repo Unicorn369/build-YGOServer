@@ -4,9 +4,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SRC_OCGCORE)
+if(ANDROID)
+    add_compile_options(-fno-strict-aliasing -Wno-multichar -Wno-format-security)
+endif()
 
-#include_directories ( ../lua )
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SRC_OCGCORE)
 
 add_library (ocgcore STATIC ${SRC_OCGCORE})
 

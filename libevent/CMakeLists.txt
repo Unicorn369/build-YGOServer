@@ -20,7 +20,17 @@ target_sources(event PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/log.c
     ${CMAKE_CURRENT_SOURCE_DIR}/signal.c)
 
-if(APPLE)
+if(ANDROID)
+    target_include_directories(event PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/android
+        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_sources(event PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/evthread_pthread.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/epoll.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/poll.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/select.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/strlcpy.c)
+elseif(APPLE)
     target_include_directories(event PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/macosx
         ${CMAKE_CURRENT_SOURCE_DIR}/include)
