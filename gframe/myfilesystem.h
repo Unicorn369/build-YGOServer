@@ -89,7 +89,8 @@ public:
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 #ifdef _MSC_VER
-		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
+		//std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
+		swprintf_s(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
 #else
 		snwprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
 #endif
