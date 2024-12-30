@@ -24,10 +24,12 @@ LOCAL_SRC_FILES := \
     source/Irrlicht/CZipReader.cpp
 
 LOCAL_CXXFLAGS := -std=gnu++11
-LOCAL_CFLAGS := -D_IRR_ANDROID_PLATFORM_ -D_IRR_USE_NON_SYSTEM_ZLIB_ -Wall -pipe -fno-exceptions -fno-rtti -fstrict-aliasing
+LOCAL_CFLAGS := -Wall -pipe -fno-exceptions -fno-rtti -fstrict-aliasing
 LOCAL_EXPORT_LDLIBS := -lz
 LOCAL_CFLAGS += \
     -D_IRR_STATIC_LIB_ \
+    -D_IRR_ANDROID_PLATFORM_ \
+    -DNO_IRR_USE_NON_SYSTEM_ZLIB_ \
     -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ \
     -DNO_IRR_COMPILE_WITH_BZIP2_ \
     -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ \

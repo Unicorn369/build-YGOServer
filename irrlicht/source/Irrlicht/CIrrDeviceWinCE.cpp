@@ -709,7 +709,11 @@ void CIrrDeviceWinCE::closeDevice()
 	if (!ExternalWindow)
 	{
 		DestroyWindow(HWnd);
+#ifdef __MINGW32__
+		const char* ClassName = __TEXT("CIrrDeviceWin32");
+#else
 		const fschar_t* ClassName = __TEXT("CIrrDeviceWin32");
+#endif
 		HINSTANCE hInstance = GetModuleHandle(0);
 		UnregisterClass(ClassName, hInstance);
 	}

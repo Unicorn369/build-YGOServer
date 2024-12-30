@@ -1011,7 +1011,11 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
 	// create the window if we need to and we do not use the null device
 	if (!CreationParams.WindowId && CreationParams.DriverType != video::EDT_NULL)
 	{
+#ifdef __MINGW32__
+		const char* ClassName = __TEXT("CIrrDeviceWin32");
+#else
 		const fschar_t* ClassName = __TEXT("CIrrDeviceWin32");
+#endif
 
 		// Register Class
 		WNDCLASSEX wcex;
