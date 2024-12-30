@@ -47,7 +47,7 @@ public:
 	}
 
 	static bool MakeDir(const wchar_t* wdir) {
-		return CreateDirectoryW(wdir, NULL);
+		return CreateDirectoryW(wdir, nullptr);
 	}
 
 	static bool MakeDir(const char* dir) {
@@ -72,7 +72,7 @@ public:
 		wchar_t pdir[256];
 		BufferIO::CopyWideString(wdir, pdir);
 		SHFILEOPSTRUCTW lpFileOp{};
-		lpFileOp.hwnd = NULL;
+		lpFileOp.hwnd = nullptr;
 		lpFileOp.wFunc = FO_DELETE;
 		lpFileOp.pFrom = pdir;
 		lpFileOp.pTo = 0;
@@ -89,8 +89,7 @@ public:
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 #ifdef _MSC_VER
-		//std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
-		swprintf_s(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
+		std::swprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
 #else
 		snwprintf(findstr, sizeof findstr / sizeof findstr[0], L"%s/*", wpath);
 #endif
