@@ -1,6 +1,5 @@
 #include "data_manager.h"
 #include "game.h"
-#include <stdio.h>
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include "spmemvfs/spmemvfs.h"
 #endif
@@ -8,9 +7,9 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-unsigned char DataManager::scriptBuffer[0x20000];
+unsigned char DataManager::scriptBuffer[0x100000] = {};
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-IFileSystem* DataManager::FileSystem;
+irr::io::IFileSystem* DataManager::FileSystem = nullptr;
 #endif
 DataManager dataManager;
 
@@ -18,14 +17,14 @@ DataManager::DataManager() : _datas(32768), _strings(32768) {
 	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
-	sqlite3_stmt* pStmt{};
+	sqlite3_stmt* pStmt = nullptr;
 #ifdef YGOPRO_SERVER_MODE
 	const char* sql = "select * from datas";
 #else
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 #endif
 	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-		return Error(pDB);
+		return Error(pDB, pStmt);
 #ifndef YGOPRO_SERVER_MODE
 	wchar_t strBuffer[4096];
 #endif
@@ -34,13 +33,11 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 		CardDataC cd;
 		CardString cs;
 		step = sqlite3_step(pStmt);
-		if (step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-			return Error(pDB, pStmt);
-		else if (step == SQLITE_ROW) {
+		if (step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			auto setcode = sqlite3_column_int64(pStmt, 3);
+			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
 			if (setcode) {
 				auto it = extra_setcode.find(cd.code);
 				if (it != extra_setcode.end()) {
@@ -53,7 +50,7 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 				else
 					cd.set_setcode(setcode);
 			}
-			cd.type = sqlite3_column_int(pStmt, 4);
+			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
 			if (cd.type & TYPE_LINK) {
@@ -62,13 +59,13 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			}
 			else
 				cd.link_marker = 0;
-			unsigned int level = sqlite3_column_int(pStmt, 7);
+			uint32_t level = static_cast<uint32_t>(sqlite3_column_int(pStmt, 7));
 			cd.level = level & 0xff;
 			cd.lscale = (level >> 24) & 0xff;
 			cd.rscale = (level >> 16) & 0xff;
-			cd.race = sqlite3_column_int(pStmt, 8);
-			cd.attribute = sqlite3_column_int(pStmt, 9);
-			cd.category = sqlite3_column_int(pStmt, 10);
+			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
+			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
+			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
 			_datas[cd.code] = cd;
 #ifndef YGOPRO_SERVER_MODE
 			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
@@ -89,7 +86,9 @@ bool DataManager::ReadDB(sqlite3* pDB) {
 			_strings[cd.code] = cs;
 #endif //YGOPRO_SERVER_MODE
 		}
-	} while (step != SQLITE_DONE);
+		else if (step != SQLITE_DONE)
+			return Error(pDB, pStmt);
+	} while (step == SQLITE_ROW);
 	sqlite3_finalize(pStmt);
 	return true;
 }
@@ -106,17 +105,17 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	sqlite3_close(pDB);
 #else
 #ifdef _WIN32
-	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+	auto reader = FileSystem->createAndOpenFile(wfile);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(file);
+	auto reader = FileSystem->createAndOpenFile(file);
 #endif
 	if(reader == nullptr)
 		return false;
 	spmemvfs_db_t db;
-	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmembuffer_t* mem = (spmembuffer_t*)std::calloc(sizeof(spmembuffer_t), 1);
 	spmemvfs_env_init();
 	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)malloc(mem->total + 1);
+	mem->data = (char*)std::malloc(mem->total + 1);
 	reader->read(mem->data, mem->total);
 	reader->drop();
 	(mem->data)[mem->total] = '\0';
@@ -130,19 +129,19 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #endif //YGOPRO_SERVER_MODE
 	return ret;
 }
+#ifndef YGOPRO_SERVER_MODE
 bool DataManager::LoadStrings(const char* file) {
-	FILE* fp = fopen(file, "r");
+	FILE* fp = std::fopen(file, "r");
 	if(!fp)
 		return false;
 	char linebuf[TEXT_LINE_SIZE]{};
-	while(fgets(linebuf, sizeof linebuf, fp)) {
+	while(std::fgets(linebuf, sizeof linebuf, fp)) {
 		ReadStringConfLine(linebuf);
 	}
-	fclose(fp);
+	std::fclose(fp);
 	return true;
 }
-#ifndef YGOPRO_SERVER_MODE
-bool DataManager::LoadStrings(IReadFile* reader) {
+bool DataManager::LoadStrings(irr::io::IReadFile* reader) {
 	char ch{};
 	std::string linebuf;
 	while (reader->read(&ch, 1)) {
@@ -157,38 +156,38 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 	reader->drop();
 	return true;
 }
-#endif //YGOPRO_SERVER_MODE
 void DataManager::ReadStringConfLine(const char* linebuf) {
 	if(linebuf[0] != '!')
 		return;
 	char strbuf[TEXT_LINE_SIZE]{};
 	int value{};
 	wchar_t strBuffer[4096]{};
-	if (sscanf(linebuf, "!%63s", strbuf) != 1)
+	if (std::sscanf(linebuf, "!%63s", strbuf) != 1)
 		return;
 	if(!std::strcmp(strbuf, "system")) {
-		if (sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_sysStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "victory")) {
-		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_victoryStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "counter")) {
-		if (sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_counterStrings[value] = strBuffer;
 	} else if(!std::strcmp(strbuf, "setname")) {
 		//using tab for comment
-		if (sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
+		if (std::sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf) != 2)
 			return;
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_setnameStrings[value] = strBuffer;
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	errmsg[0] = '\0';
 	std::strncat(errmsg, sqlite3_errmsg(pDB), sizeof errmsg - 1);
@@ -199,6 +198,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 code_pointer DataManager::GetCodePointer(unsigned int code) const {
 	return _datas.find(code);
 }
+#ifndef YGOPRO_SERVER_MODE
 string_pointer DataManager::GetStringPointer(unsigned int code) const {
 	return _strings.find(code);
 }
@@ -214,6 +214,7 @@ string_pointer DataManager::strings_begin() const {
 string_pointer DataManager::strings_end() const {
 	return _strings.cend();
 }
+#endif //YGOPRO_SERVER_MODE
 bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
@@ -223,6 +224,7 @@ bool DataManager::GetData(unsigned int code, CardData* pData) const {
 	}
 	return true;
 }
+#ifndef YGOPRO_SERVER_MODE
 bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
@@ -284,7 +286,7 @@ const wchar_t* DataManager::GetCounterName(int code) const {
 const wchar_t* DataManager::GetSetName(int code) const {
 	auto csit = _setnameStrings.find(code);
 	if(csit == _setnameStrings.end())
-		return nullptr;
+		return unknown_string;
 	return csit->second.c_str();
 }
 std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
@@ -380,11 +382,9 @@ std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 		if (!setcode[i])
 			break;
 		const wchar_t* setname = GetSetName(setcode[i]);
-		if(setname) {
-			if (!buffer.empty())
-				buffer.push_back(L'|');
-			buffer.append(setname);
-		}
+		if (!buffer.empty())
+			buffer.push_back(L'|');
+		buffer.append(setname);
 	}
 	if (buffer.empty())
 		return std::wstring(unknown_string);
@@ -410,78 +410,74 @@ std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
 		buffer.append(L"[\u2198]");
 	return buffer;
 }
+#endif //YGOPRO_SERVER_MODE
 uint32_t DataManager::CardReader(uint32_t code, card_data* pData) {
 	if (!dataManager.GetData(code, pData))
 		pData->clear();
 	return 0;
 }
-unsigned char* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
-	if (std::strncmp(script_name, "./script", 8) != 0)
-		return DefaultScriptReader(script_name, slen);
-	unsigned char* buffer;
-#ifndef YGOPRO_SERVER_MODE
-	if(!mainGame->gameConf.prefer_expansion_script) {
-		buffer = ScriptReaderExSingle("", script_name, slen);
-		if(buffer)
-			return buffer;
+unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
+	// default script name: ./script/c%d.lua
+	if (std::strncmp(script_path, "./script", 8) != 0) // not a card script file
+		return ReadScriptFromFile(script_path, slen);
+	const char* script_name = script_path + 2;
+	char expansions_path[1024]{};
+	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+#ifdef YGOPRO_SERVER_MODE
+	char special_path[1024]{};
+	std::snprintf(special_path, sizeof special_path, "./specials/%s", script_path + 9);
+	if (ReadScriptFromFile(special_path, slen))
+		return scriptBuffer;
+	if (ReadScriptFromFile(expansions_path, slen)) // always read expansions first
+		return scriptBuffer;
+#ifdef SERVER_ZIP_SUPPORT
+	if (ReadScriptFromIrrFS(script_name, slen))
+		return scriptBuffer;
+#endif
+	if (ReadScriptFromFile(script_path, slen))
+		return scriptBuffer;
+#else //YGOPRO_SERVER_MODE
+	if (mainGame->gameConf.prefer_expansion_script) { // debug script with raw file in expansions
+		if (ReadScriptFromFile(expansions_path, slen))
+			return scriptBuffer;
+		if (ReadScriptFromIrrFS(script_name, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(script_path, slen))
+			return scriptBuffer;
+	} else {
+		if (ReadScriptFromIrrFS(script_name, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(script_path, slen))
+			return scriptBuffer;
+		if (ReadScriptFromFile(expansions_path, slen))
+			return scriptBuffer;
 	}
 #endif //YGOPRO_SERVER_MODE
-	buffer = ScriptReaderExSingle("specials/", script_name, slen, 9);
-	if(buffer)
-		return buffer;
-	buffer = ScriptReaderExSingle("expansions/", script_name, slen);
-	if(buffer)
-		return buffer;
+	return nullptr;
+}
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-	buffer = ScriptReaderExSingle("", script_name, slen, 2, TRUE);
-	if(buffer)
-		return buffer;
-#endif
-	return ScriptReaderExSingle("", script_name, slen);
-}
-unsigned char* DataManager::ScriptReaderExSingle(const char* path, const char* script_name, int* slen, int pre_len, unsigned int use_irr) {
-	char sname[256];
-	snprintf(sname, sizeof sname, "%s%s", path, script_name + pre_len); //default script name: ./script/c%d.lua
-	if (use_irr) {
-		return ScriptReader(sname, slen);
-	}
-	return DefaultScriptReader(sname, slen);
-}
-unsigned char* DataManager::ScriptReader(const char* script_name, int* slen) {
-#if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
-	FILE* fp = fopen(script_name, "rb");
-	if(!fp)
-		return 0;
-	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
-	fclose(fp);
-	if(len >= sizeof(scriptBuffer))
-		return 0;
-	*slen = len;
-#else
+unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
 #ifdef _WIN32
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+	auto reader = FileSystem->createAndOpenFile(fname);
 #else
-	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
+	auto reader = FileSystem->createAndOpenFile(script_name);
 #endif
 	if (!reader)
 		return nullptr;
-	size_t size = reader->getSize();
-	if (size > sizeof scriptBuffer) {
-		reader->drop();
-		return nullptr;
-	}
-	reader->read(scriptBuffer, size);
+	int size = reader->read(scriptBuffer, sizeof scriptBuffer);
 	reader->drop();
-	*slen = (int)size;
-#endif //YGOPRO_SERVER_MODE
+	if (size >= (int)sizeof scriptBuffer)
+		return nullptr;
+	*slen = size;
 	return scriptBuffer;
 }
-unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* slen) {
+#endif //YGOPRO_SERVER_MODE
+unsigned char* DataManager::ReadScriptFromFile(const char* script_name, int* slen) {
 	wchar_t fname[256]{};
 	BufferIO::DecodeUTF8(script_name, fname);
-	FILE* fp = myfopen(fname, "rb");
+	FILE* fp = mywfopen(fname, "rb");
 	if (!fp)
 		return nullptr;
 	size_t len = std::fread(scriptBuffer, 1, sizeof scriptBuffer, fp);
@@ -491,5 +487,75 @@ unsigned char* DataManager::DefaultScriptReader(const char* script_name, int* sl
 	*slen = (int)len;
 	return scriptBuffer;
 }
+#ifndef YGOPRO_SERVER_MODE
+bool DataManager::deck_sort_lv(code_pointer p1, code_pointer p2) {
+	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
+		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
+	if ((p1->second.type & 0x7) == 1) {
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+		if (type1 != type2)
+			return type1 < type2;
+		if (p1->second.level != p2->second.level)
+			return p1->second.level > p2->second.level;
+		if (p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if (p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		return p1->first < p2->first;
+	}
+	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
+		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool DataManager::deck_sort_atk(code_pointer p1, code_pointer p2) {
+	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
+		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
+	if ((p1->second.type & 0x7) == 1) {
+		if (p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if (p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		if (p1->second.level != p2->second.level)
+			return p1->second.level > p2->second.level;
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+		if (type1 != type2)
+			return type1 < type2;
+		return p1->first < p2->first;
+	}
+	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
+		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool DataManager::deck_sort_def(code_pointer p1, code_pointer p2) {
+	if ((p1->second.type & 0x7) != (p2->second.type & 0x7))
+		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
+	if ((p1->second.type & 0x7) == 1) {
+		if (p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		if (p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if (p1->second.level != p2->second.level)
+			return p1->second.level > p2->second.level;
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
+		if (type1 != type2)
+			return type1 < type2;
+		return p1->first < p2->first;
+	}
+	if ((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
+		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool DataManager::deck_sort_name(code_pointer p1, code_pointer p2) {
+	const wchar_t* name1 = dataManager.GetName(p1->first);
+	const wchar_t* name2 = dataManager.GetName(p2->first);
+	int res = std::wcscmp(name1, name2);
+	if (res != 0)
+		return res < 0;
+	return p1->first < p2->first;
+}
+#endif //YGOPRO_SERVER_MODE
 
 }

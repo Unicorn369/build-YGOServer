@@ -1,6 +1,7 @@
 #ifndef SINGLE_DUEL_H
 #define SINGLE_DUEL_H
 
+#include <set>
 #include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
@@ -89,3 +90,4 @@ protected:
 }
 
 #endif //SINGLE_DUEL_H
+

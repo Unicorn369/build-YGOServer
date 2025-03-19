@@ -3,6 +3,9 @@
 
 #define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
+
+#include <cerrno>
+
 #ifdef _WIN32
 
 #define NOMINMAX
@@ -14,15 +17,14 @@
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
-#define mywcsncasecmp wcsnicmp
-#define mystrncasecmp strnicmp
+#define mywcsncasecmp wcsncasecmp
+#define mystrncasecmp strncasecmp
 #endif
 
 #define socklen_t int
 
 #else //_WIN32
 
-#include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -43,22 +45,20 @@
 #define mystrncasecmp strncasecmp
 #endif
 
-#include <wchar.h>
-template<size_t N, typename... TR>
-inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-	return swprintf(buf, N, fmt, args...);
-}
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
 #include <string>
 #include "bufferio.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
 
-inline FILE* myfopen(const wchar_t* filename, const char* mode) {
+template<size_t N, typename... TR>
+inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
+	return std::swprintf(buf, N, fmt, args...);
+}
+
+inline FILE* mywfopen(const wchar_t* filename, const char* mode) {
 	FILE* fp{};
 #ifdef _WIN32
 	wchar_t wmode[20]{};
@@ -67,25 +67,13 @@ inline FILE* myfopen(const wchar_t* filename, const char* mode) {
 #else
 	char fname[1024]{};
 	BufferIO::EncodeUTF8(filename, fname);
-	fp = fopen(fname, mode);
+	fp = std::fopen(fname, mode);
 #endif
 	return fp;
 }
 
-#ifndef YGOPRO_SERVER_MODE
+#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 #include <irrlicht.h>
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-#endif //YGOPRO_SERVER_MODE
-
-#ifdef SERVER_ZIP_SUPPORT
-#include <irrlicht.h>
-using namespace irr;
-using namespace io;
 #endif
 
 extern const unsigned short PRO_VERSION;

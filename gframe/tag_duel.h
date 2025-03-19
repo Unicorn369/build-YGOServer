@@ -1,6 +1,7 @@
 #ifndef TAG_DUEL_H
 #define TAG_DUEL_H
 
+#include <set>
 #include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
@@ -87,3 +88,4 @@ protected:
 }
 
 #endif //TAG_DUEL_H
+
