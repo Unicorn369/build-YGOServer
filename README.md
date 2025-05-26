@@ -26,9 +26,9 @@ x86_64
 ## 如何编译
 编译请参考`build/build.bat`或`build/build.sh`
 
-对于某些`Linux平台`需改用`libevent/linux/event2/event-config2.h`否则程序无法正常运行
+对于某些`Linux平台`需改用`libevent/linux/event2/event-config-debian12.h`否则程序无法正常运行
 
-交叉编译`macOS平台`请使用[osxcross](https://github.com/tpoechtrager/osxcross)
+在Linux平台上，交叉编译`macOS`与`windows`请使用此工具 --> [tools](https://github.com/Unicorn369/build-YGOServer/releases/tag/v0.0.0)
 
 ### 使用CMAKE编译
 通用(Linux/macOS/Windows)
@@ -52,7 +52,7 @@ cmake .. -A"x64"
 cmake --build . --config Release
 ```
 
-使用MinGW编译(推荐使用[clang](https://github.com/mstorsjo/llvm-mingw/releases/tag/20200325))
+使用MinGW编译(推荐使用[llvm](https://github.com/Unicorn369/build-YGOServer/releases/download/v0.0.0/win64-llvm-mingw.zip))
 ```
 cd build
 cmake .. -G"MinGW Makefiles"
