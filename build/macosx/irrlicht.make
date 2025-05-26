@@ -23,8 +23,8 @@ ifeq ($(config),release)
   TARGETDIR = bin/Release
   TARGET = $(TARGETDIR)/libirrlicht.a
   OBJDIR = obj/Release/irrlicht
-  DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht -I../../irrlicht/source/Irrlicht/zlib
+  DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
+  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
   FORCE_INCLUDE +=
   OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
@@ -59,8 +59,8 @@ ifeq ($(config),debug)
   TARGETDIR = bin/Debug
   TARGET = $(TARGETDIR)/libirrlicht.a
   OBJDIR = obj/Debug/irrlicht
-  DEFINES += -D_DEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht -I../../irrlicht/source/Irrlicht/zlib
+  DEFINES += -D_DEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
+  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
   FORCE_INCLUDE +=
   OSX_CFLAGS = -arch x86_64 -arch arm64
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
@@ -94,12 +94,6 @@ OBJECTS := \
 	$(OBJDIR)/CXMLWriter.o \
 	$(OBJDIR)/CZipReader.o \
 	$(OBJDIR)/os.o \
-	$(OBJDIR)/adler32.o \
-	$(OBJDIR)/crc32.o \
-	$(OBJDIR)/inffast.o \
-	$(OBJDIR)/inflate.o \
-	$(OBJDIR)/inftrees.o \
-	$(OBJDIR)/zutil.o \
 
 RESOURCES := \
 
@@ -191,24 +185,6 @@ $(OBJDIR)/CZipReader.o: ../../irrlicht/source/Irrlicht/CZipReader.cpp
 $(OBJDIR)/os.o: ../../irrlicht/source/Irrlicht/os.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/adler32.o: ../../irrlicht/source/Irrlicht/zlib/adler32.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/crc32.o: ../../irrlicht/source/Irrlicht/zlib/crc32.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inffast.o: ../../irrlicht/source/Irrlicht/zlib/inffast.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inflate.o: ../../irrlicht/source/Irrlicht/zlib/inflate.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inftrees.o: ../../irrlicht/source/Irrlicht/zlib/inftrees.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/zutil.o: ../../irrlicht/source/Irrlicht/zlib/zutil.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))

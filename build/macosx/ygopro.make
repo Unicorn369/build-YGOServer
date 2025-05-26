@@ -31,7 +31,7 @@ ifeq ($(config),release)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += bin/Release/libocgcore.a bin/Release/libclzma.a bin/Release/libevent.a bin/Release/liblua.a bin/Release/libirrlicht.a bin/Release/libcspmemvfs.a -lsqlite3 -ldl -lpthread
+  LIBS += bin/Release/libocgcore.a bin/Release/libclzma.a bin/Release/libevent.a bin/Release/liblua.a bin/Release/libirrlicht.a bin/Release/libcspmemvfs.a -lsqlite3 -ldl -lpthread -lz
   LDDEPS += bin/Release/libocgcore.a bin/Release/libclzma.a bin/Release/libevent.a bin/Release/liblua.a bin/Release/libirrlicht.a bin/Release/libcspmemvfs.a
   ALL_LDFLAGS += $(LDFLAGS) $(OSX_CFLAGS)
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
@@ -66,7 +66,7 @@ ifeq ($(config),debug)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += bin/Debug/libocgcore.a bin/Debug/libclzma.a bin/Debug/libevent.a bin/Debug/liblua.a bin/Debug/libirrlicht.a bin/Debug/libcspmemvfs.a -lsqlite3 -ldl -lpthread
+  LIBS += bin/Debug/libocgcore.a bin/Debug/libclzma.a bin/Debug/libevent.a bin/Debug/liblua.a bin/Debug/libirrlicht.a bin/Debug/libcspmemvfs.a -lsqlite3 -ldl -lpthread -lz
   LDDEPS += bin/Debug/libocgcore.a bin/Debug/libclzma.a bin/Debug/libevent.a bin/Debug/liblua.a bin/Debug/libirrlicht.a bin/Debug/libcspmemvfs.a
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
