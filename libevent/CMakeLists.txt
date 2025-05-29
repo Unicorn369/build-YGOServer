@@ -23,7 +23,8 @@ target_sources(event PRIVATE
 if(ANDROID)
     target_include_directories(event PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/android
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat)
     target_sources(event PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/evthread_pthread.c
         ${CMAKE_CURRENT_SOURCE_DIR}/epoll.c
@@ -33,7 +34,8 @@ if(ANDROID)
 elseif(APPLE)
     target_include_directories(event PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/macosx
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat)
     target_sources(event PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/evthread_pthread.c
         ${CMAKE_CURRENT_SOURCE_DIR}/poll.c
@@ -42,7 +44,8 @@ elseif(APPLE)
 elseif(UNIX)
     target_include_directories(event PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/linux
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat)
     target_sources(event PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/evthread_pthread.c
         ${CMAKE_CURRENT_SOURCE_DIR}/epoll.c
@@ -51,9 +54,9 @@ elseif(UNIX)
         ${CMAKE_CURRENT_SOURCE_DIR}/strlcpy.c)
 elseif(WIN32)
     target_include_directories(event PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/compat
         ${CMAKE_CURRENT_SOURCE_DIR}/Win32
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat)
     target_sources(event PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/buffer_iocp.c
         ${CMAKE_CURRENT_SOURCE_DIR}/bufferevent_async.c

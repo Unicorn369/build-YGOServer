@@ -37,8 +37,11 @@ else()
     target_link_libraries (ygopro -ldl -lpthread)
 endif()
 
-if(SERVER_PRO2_SUPPORT)
+if(SERVER_ZIP_SUPPORT)
     target_link_libraries(ygopro irrlicht)
+endif()
+
+if(SERVER_PRO2_SUPPORT)
     if(ANDROID)
         set_target_properties(ygopro PROPERTIES OUTPUT_NAME "AI.Server.ndk")
     elseif(APPLE)

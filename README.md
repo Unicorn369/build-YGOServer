@@ -33,28 +33,28 @@ x86_64
 ### 使用CMAKE编译
 通用(Linux/macOS/Windows)
 ```
-cd build
+mkdir -p build-cmake && cd build-cmake
 cmake ..
 cmake --build . --config Release
 ```
 
 使用NDK编译(Android)
 ```
-cd build
+mkdir -p build-cmake && cd build-cmake
 cmake .. -DCMAKE_TOOLCHAIN_FILE=${NDK_HOME}/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_NATIVE_API_LEVEL=21 -DANDROID_TOOLCHAIN=clang
 cmake --build . --config Release
 ```
 
 构造64位(Windows)
 ```
-cd build
+mkdir -p build-cmake && cd build-cmake
 cmake .. -A"x64"
 cmake --build . --config Release
 ```
 
-使用MinGW编译(推荐使用[llvm](https://github.com/Unicorn369/build-YGOServer/releases/download/v0.0.0/win64-llvm-mingw.zip))
+使用[MinGW](https://github.com/Unicorn369/build-YGOServer/releases/download/v0.0.0/win64-llvm-mingw.zip)编译(Windows)
 ```
-cd build
+mkdir -p build-cmake && cd build-cmake
 cmake .. -G"MinGW Makefiles"
 cmake --build . --config Release
 ```
