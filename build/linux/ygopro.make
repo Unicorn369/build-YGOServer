@@ -27,6 +27,9 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
+ifeq ($(origin STRIP), default)
+  STRIP = strip
+endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.linux
@@ -87,6 +90,7 @@ $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	@echo Linking ygopro
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
+	$(SILENT) $(STRIP) $(TARGET)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)

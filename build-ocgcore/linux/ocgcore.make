@@ -16,7 +16,7 @@ ifeq ($(config),release)
   TARGET = $(TARGETDIR)/libocgcore.so
   OBJDIR = obj/Release/ocgcore
   DEFINES += -DYGOPRO_PRO2_SUPPORT
-  INCLUDES += -I../../lua
+  INCLUDES += -I../../lua/src
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -fPIC
@@ -43,7 +43,7 @@ ifeq ($(config),debug)
   TARGET = $(TARGETDIR)/libocgcore.so
   OBJDIR = obj/Debug/ocgcore
   DEFINES += -D_DEBUG -DYGOPRO_PRO2_SUPPORT
-  INCLUDES += -I../../lua
+  INCLUDES += -I../../lua/src
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -fPIC -g

@@ -77,7 +77,6 @@ OBJECTS := \
 	$(OBJDIR)/ldump.o \
 	$(OBJDIR)/lfunc.o \
 	$(OBJDIR)/lgc.o \
-	$(OBJDIR)/linit.o \
 	$(OBJDIR)/liolib.o \
 	$(OBJDIR)/llex.o \
 	$(OBJDIR)/lmathlib.o \
@@ -155,100 +154,97 @@ else
 $(OBJECTS): | $(OBJDIR)
 endif
 
-$(OBJDIR)/lapi.o: ../../lua/lapi.c
+$(OBJDIR)/lapi.o: ../../lua/src/lapi.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lauxlib.o: ../../lua/lauxlib.c
+$(OBJDIR)/lauxlib.o: ../../lua/src/lauxlib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lbaselib.o: ../../lua/lbaselib.c
+$(OBJDIR)/lbaselib.o: ../../lua/src/lbaselib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lcode.o: ../../lua/lcode.c
+$(OBJDIR)/lcode.o: ../../lua/src/lcode.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lcorolib.o: ../../lua/lcorolib.c
+$(OBJDIR)/lcorolib.o: ../../lua/src/lcorolib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lctype.o: ../../lua/lctype.c
+$(OBJDIR)/lctype.o: ../../lua/src/lctype.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ldblib.o: ../../lua/ldblib.c
+$(OBJDIR)/ldblib.o: ../../lua/src/ldblib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ldebug.o: ../../lua/ldebug.c
+$(OBJDIR)/ldebug.o: ../../lua/src/ldebug.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ldo.o: ../../lua/ldo.c
+$(OBJDIR)/ldo.o: ../../lua/src/ldo.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ldump.o: ../../lua/ldump.c
+$(OBJDIR)/ldump.o: ../../lua/src/ldump.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lfunc.o: ../../lua/lfunc.c
+$(OBJDIR)/lfunc.o: ../../lua/src/lfunc.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lgc.o: ../../lua/lgc.c
+$(OBJDIR)/lgc.o: ../../lua/src/lgc.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/linit.o: ../../lua/linit.c
+$(OBJDIR)/liolib.o: ../../lua/src/liolib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/liolib.o: ../../lua/liolib.c
+$(OBJDIR)/llex.o: ../../lua/src/llex.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/llex.o: ../../lua/llex.c
+$(OBJDIR)/lmathlib.o: ../../lua/src/lmathlib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lmathlib.o: ../../lua/lmathlib.c
+$(OBJDIR)/lmem.o: ../../lua/src/lmem.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lmem.o: ../../lua/lmem.c
+$(OBJDIR)/loadlib.o: ../../lua/src/loadlib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/loadlib.o: ../../lua/loadlib.c
+$(OBJDIR)/lobject.o: ../../lua/src/lobject.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lobject.o: ../../lua/lobject.c
+$(OBJDIR)/lopcodes.o: ../../lua/src/lopcodes.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lopcodes.o: ../../lua/lopcodes.c
+$(OBJDIR)/loslib.o: ../../lua/src/loslib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/loslib.o: ../../lua/loslib.c
+$(OBJDIR)/lparser.o: ../../lua/src/lparser.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lparser.o: ../../lua/lparser.c
+$(OBJDIR)/lstate.o: ../../lua/src/lstate.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lstate.o: ../../lua/lstate.c
+$(OBJDIR)/lstring.o: ../../lua/src/lstring.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lstring.o: ../../lua/lstring.c
+$(OBJDIR)/lstrlib.o: ../../lua/src/lstrlib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lstrlib.o: ../../lua/lstrlib.c
+$(OBJDIR)/ltable.o: ../../lua/src/ltable.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ltable.o: ../../lua/ltable.c
+$(OBJDIR)/ltablib.o: ../../lua/src/ltablib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ltablib.o: ../../lua/ltablib.c
+$(OBJDIR)/ltm.o: ../../lua/src/ltm.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ltm.o: ../../lua/ltm.c
+$(OBJDIR)/lundump.o: ../../lua/src/lundump.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lundump.o: ../../lua/lundump.c
+$(OBJDIR)/lutf8lib.o: ../../lua/src/lutf8lib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lutf8lib.o: ../../lua/lutf8lib.c
+$(OBJDIR)/lvm.o: ../../lua/src/lvm.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lvm.o: ../../lua/lvm.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/lzio.o: ../../lua/lzio.c
+$(OBJDIR)/lzio.o: ../../lua/src/lzio.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
