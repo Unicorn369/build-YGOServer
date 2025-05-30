@@ -42,6 +42,7 @@ if(SERVER_ZIP_SUPPORT)
 endif()
 
 if(SERVER_PRO2_SUPPORT)
+    target_link_libraries(ygopro irrlicht)
     if(ANDROID)
         set_target_properties(ygopro PROPERTIES OUTPUT_NAME "AI.Server.ndk")
     elseif(APPLE)

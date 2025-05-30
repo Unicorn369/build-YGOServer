@@ -1,7 +1,11 @@
 project (lua)
 
-file(GLOB SRC_LUA "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
-list(REMOVE_ITEM SRC_LUA "${CMAKE_CURRENT_SOURCE_DIR}/lua.c")
+file(GLOB SRC_LUA "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+list(REMOVE_ITEM SRC_LUA "${CMAKE_CURRENT_SOURCE_DIR}/src/lua.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/src/luac.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/src/linit.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/src/onelua.c")
+
 set(FLAGS "-fopenmp -Wall -Wextra -Werror")
 set_source_files_properties("${SRC_LUA}" PROPERTIES COMPILE_FLAGS ${FLAGS})
 
@@ -22,4 +26,5 @@ elseif(UNIX)
 endif()
 
 add_library (lua STATIC ${SRC_LUA})
-target_include_directories(lua PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+target_include_directories(lua PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)

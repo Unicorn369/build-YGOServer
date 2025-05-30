@@ -6,7 +6,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release")
 endif()
-option(SERVER_ZIP_SUPPORT "Build SERVER_ZIP_SUPPORT" OFF)
+option(SERVER_ZIP_SUPPORT "Build SERVER_ZIP_SUPPORT" ON)
 option(SERVER_PRO2_SUPPORT "Build SERVER_PRO2_SUPPORT" ON)
 
 if(MSVC)
@@ -21,7 +21,7 @@ add_subdirectory (lua)
 add_subdirectory (sqlite3)
 
 if(SERVER_PRO2_SUPPORT)
-    set(SERVER_ZIP_SUPPORT "ON")
+    set(SERVER_ZIP_SUPPORT ON)
     target_compile_definitions(ygopro PUBLIC -DSERVER_PRO2_SUPPORT)
 endif()
 
@@ -31,4 +31,5 @@ if(SERVER_ZIP_SUPPORT)
 endif()
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Build SERVER_ZIP_SUPPORT: ${SERVER_ZIP_SUPPORT}")
 message(STATUS "Build SERVER_PRO2_SUPPORT: ${SERVER_PRO2_SUPPORT}")
