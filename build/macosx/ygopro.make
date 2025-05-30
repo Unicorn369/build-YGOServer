@@ -8,104 +8,86 @@ ifndef verbose
   SILENT = @
 endif
 
-.PHONY: clean prebuild prelink
-
-ifeq ($(config),release)
-  ifeq ($(origin CC), default)
-    CC = clang
-  endif
-  ifeq ($(origin CXX), default)
-    CXX = clang++
-  endif
-  ifeq ($(origin AR), default)
-    AR = ar
-  endif
-  TARGETDIR = bin/Release
-  TARGET = $(TARGETDIR)/AI.Server.osx
-  OBJDIR = obj/Release/ygopro
-  DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-  INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../irrlicht/include -I../../libevent/include -I../../libevent/macosx
-  FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch arm64
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti $(OSX_CFLAGS)
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += bin/Release/libocgcore.a bin/Release/libclzma.a bin/Release/libevent.a bin/Release/liblua.a bin/Release/libirrlicht.a bin/Release/libcspmemvfs.a -lsqlite3 -ldl -lpthread -lz
-  LDDEPS += bin/Release/libocgcore.a bin/Release/libclzma.a bin/Release/libevent.a bin/Release/liblua.a bin/Release/libirrlicht.a bin/Release/libcspmemvfs.a
-  ALL_LDFLAGS += $(LDFLAGS) $(OSX_CFLAGS)
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-ifeq ($(config),debug)
-  ifeq ($(origin CC), default)
-    CC = clang
-  endif
-  ifeq ($(origin CXX), default)
-    CXX = clang++
-  endif
-  ifeq ($(origin AR), default)
-    AR = ar
-  endif
-  TARGETDIR = bin/Debug
-  TARGET = $(TARGETDIR)/AI.Server.osx
-  OBJDIR = obj/Debug/ygopro
-  DEFINES += -D_DEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-  INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../irrlicht/include -I../../libevent/include -I../../libevent/macosx
-  FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += bin/Debug/libocgcore.a bin/Debug/libclzma.a bin/Debug/libevent.a bin/Debug/liblua.a bin/Debug/libirrlicht.a bin/Debug/libcspmemvfs.a -lsqlite3 -ldl -lpthread -lz
-  LDDEPS += bin/Debug/libocgcore.a bin/Debug/libclzma.a bin/Debug/libevent.a bin/Debug/liblua.a bin/Debug/libirrlicht.a bin/Debug/libcspmemvfs.a
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-OBJECTS := \
-	$(OBJDIR)/data_manager.o \
-	$(OBJDIR)/deck_manager.o \
-	$(OBJDIR)/game.o \
-	$(OBJDIR)/gframe.o \
-	$(OBJDIR)/netserver.o \
-	$(OBJDIR)/replay.o \
-	$(OBJDIR)/single_duel.o \
-	$(OBJDIR)/tag_duel.o \
-
-RESOURCES := \
-
-CUSTOMFILES := \
+.PHONY: clean prebuild
 
 SHELLTYPE := posix
-ifeq (.exe,$(findstring .exe,$(ComSpec)))
+ifeq ($(shell echo "test"), "test")
 	SHELLTYPE := msdos
 endif
 
-$(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
+# Configurations
+# #############################################
+
+ifeq ($(origin CC), default)
+  CC = clang
+endif
+ifeq ($(origin CXX), default)
+  CXX = clang++
+endif
+ifeq ($(origin AR), default)
+  AR = ar
+endif
+RESCOMP = windres
+TARGETDIR = bin
+TARGET = $(TARGETDIR)/AI.Server.osx
+OBJDIR = obj/Release/ygopro
+DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
+INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/macosx -I../../irrlicht/include
+FORCE_INCLUDE +=
+OSX_CFLAGS += -arch x86_64 -arch arm64
+ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) $(OSX_CFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) $(OSX_CFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
+ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+LIBS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -lsqlite3 -lz -ldl -lpthread
+LDDEPS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
+ALL_LDFLAGS += $(LDFLAGS) $(OSX_CFLAGS)
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+define PREBUILDCMDS
+endef
+define PRELINKCMDS
+endef
+define POSTBUILDCMDS
+endef
+
+# Per File Configurations
+# #############################################
+
+
+# File sets
+# #############################################
+
+GENERATED :=
+OBJECTS :=
+
+GENERATED += $(OBJDIR)/data_manager.o
+GENERATED += $(OBJDIR)/deck_manager.o
+GENERATED += $(OBJDIR)/game.o
+GENERATED += $(OBJDIR)/gframe.o
+GENERATED += $(OBJDIR)/netserver.o
+GENERATED += $(OBJDIR)/replay.o
+GENERATED += $(OBJDIR)/single_duel.o
+GENERATED += $(OBJDIR)/tag_duel.o
+OBJECTS += $(OBJDIR)/data_manager.o
+OBJECTS += $(OBJDIR)/deck_manager.o
+OBJECTS += $(OBJDIR)/game.o
+OBJECTS += $(OBJDIR)/gframe.o
+OBJECTS += $(OBJDIR)/netserver.o
+OBJECTS += $(OBJDIR)/replay.o
+OBJECTS += $(OBJDIR)/single_duel.o
+OBJECTS += $(OBJDIR)/tag_duel.o
+
+# Rules
+# #############################################
+
+all: $(TARGET)
+	@:
+
+$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+	$(PRELINKCMDS)
 	@echo Linking ygopro
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
-
-$(CUSTOMFILES): | $(OBJDIR)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
@@ -127,53 +109,62 @@ clean:
 	@echo Cleaning ygopro
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
+	$(SILENT) rm -rf $(GENERATED)
 	$(SILENT) rm -rf $(OBJDIR)
 else
 	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
+	$(SILENT) if exist $(subst /,\\,$(GENERATED)) del /s /q $(subst /,\\,$(GENERATED))
 	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
 endif
 
-prebuild:
+prebuild: | $(OBJDIR)
 	$(PREBUILDCMDS)
 
-prelink:
-	$(PRELINKCMDS)
-
 ifneq (,$(PCH))
-$(OBJECTS): $(GCH) $(PCH) | $(OBJDIR)
-$(GCH): $(PCH) | $(OBJDIR)
+$(OBJECTS): $(GCH) | $(PCH_PLACEHOLDER)
+$(GCH): $(PCH) | prebuild
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) -x c++-header $(ALL_CXXFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
+$(PCH_PLACEHOLDER): $(GCH) | $(OBJDIR)
+ifeq (posix,$(SHELLTYPE))
+	$(SILENT) touch "$@"
 else
-$(OBJECTS): | $(OBJDIR)
+	$(SILENT) echo $null >> "$@"
+endif
+else
+$(OBJECTS): | prebuild
 endif
 
+
+# File Rules
+# #############################################
+
 $(OBJDIR)/data_manager.o: ../../gframe/data_manager.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/deck_manager.o: ../../gframe/deck_manager.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/game.o: ../../gframe/game.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/gframe.o: ../../gframe/gframe.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/netserver.o: ../../gframe/netserver.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/replay.o: ../../gframe/replay.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/single_duel.o: ../../gframe/single_duel.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/tag_duel.o: ../../gframe/tag_duel.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
-  -include $(OBJDIR)/$(notdir $(PCH)).d
+  -include $(PCH_PLACEHOLDER).d
 endif

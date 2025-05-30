@@ -8,108 +8,91 @@ ifndef verbose
   SILENT = @
 endif
 
-.PHONY: clean prebuild prelink
-
-ifeq ($(config),release)
-  ifeq ($(origin CC), default)
-    CC = clang
-  endif
-  ifeq ($(origin CXX), default)
-    CXX = clang++
-  endif
-  ifeq ($(origin AR), default)
-    AR = ar
-  endif
-  TARGETDIR = bin/Release
-  TARGET = $(TARGETDIR)/libirrlicht.a
-  OBJDIR = obj/Release/irrlicht
-  DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
-  FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch arm64
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-exceptions -fno-rtti -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS +=
-  LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-ifeq ($(config),debug)
-  ifeq ($(origin CC), default)
-    CC = clang
-  endif
-  ifeq ($(origin CXX), default)
-    CXX = clang++
-  endif
-  ifeq ($(origin AR), default)
-    AR = ar
-  endif
-  TARGETDIR = bin/Debug
-  TARGET = $(TARGETDIR)/libirrlicht.a
-  OBJDIR = obj/Debug/irrlicht
-  DEFINES += -D_DEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-  INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
-  FORCE_INCLUDE +=
-  OSX_CFLAGS = -arch x86_64 -arch arm64
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -fno-exceptions -fno-rtti -stdlib=libc++ -fno-strict-aliasing -Wno-multichar -Wno-format-security $(OSX_CFLAGS)
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS +=
-  LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-OBJECTS := \
-	$(OBJDIR)/CAttributes.o \
-	$(OBJDIR)/CFileList.o \
-	$(OBJDIR)/CFileSystem.o \
-	$(OBJDIR)/CLimitReadFile.o \
-	$(OBJDIR)/CMemoryFile.o \
-	$(OBJDIR)/CReadFile.o \
-	$(OBJDIR)/CWriteFile.o \
-	$(OBJDIR)/CXMLReader.o \
-	$(OBJDIR)/CXMLWriter.o \
-	$(OBJDIR)/CZipReader.o \
-	$(OBJDIR)/os.o \
-
-RESOURCES := \
-
-CUSTOMFILES := \
+.PHONY: clean prebuild
 
 SHELLTYPE := posix
-ifeq (.exe,$(findstring .exe,$(ComSpec)))
+ifeq ($(shell echo "test"), "test")
 	SHELLTYPE := msdos
 endif
 
-$(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
+# Configurations
+# #############################################
+
+ifeq ($(origin CC), default)
+  CC = clang
+endif
+ifeq ($(origin CXX), default)
+  CXX = clang++
+endif
+ifeq ($(origin AR), default)
+  AR = ar
+endif
+RESCOMP = windres
+TARGETDIR = bin
+TARGET = $(TARGETDIR)/libirrlicht.a
+OBJDIR = obj/Release/irrlicht
+DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
+INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
+FORCE_INCLUDE +=
+ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-exceptions -fno-rtti -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+LIBS +=
+LDDEPS +=
+ALL_LDFLAGS += $(LDFLAGS)
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+define PREBUILDCMDS
+endef
+define PRELINKCMDS
+endef
+define POSTBUILDCMDS
+endef
+
+# Per File Configurations
+# #############################################
+
+
+# File sets
+# #############################################
+
+GENERATED :=
+OBJECTS :=
+
+GENERATED += $(OBJDIR)/CAttributes.o
+GENERATED += $(OBJDIR)/CFileList.o
+GENERATED += $(OBJDIR)/CFileSystem.o
+GENERATED += $(OBJDIR)/CLimitReadFile.o
+GENERATED += $(OBJDIR)/CMemoryFile.o
+GENERATED += $(OBJDIR)/CReadFile.o
+GENERATED += $(OBJDIR)/CWriteFile.o
+GENERATED += $(OBJDIR)/CXMLReader.o
+GENERATED += $(OBJDIR)/CXMLWriter.o
+GENERATED += $(OBJDIR)/CZipReader.o
+GENERATED += $(OBJDIR)/os.o
+OBJECTS += $(OBJDIR)/CAttributes.o
+OBJECTS += $(OBJDIR)/CFileList.o
+OBJECTS += $(OBJDIR)/CFileSystem.o
+OBJECTS += $(OBJDIR)/CLimitReadFile.o
+OBJECTS += $(OBJDIR)/CMemoryFile.o
+OBJECTS += $(OBJDIR)/CReadFile.o
+OBJECTS += $(OBJDIR)/CWriteFile.o
+OBJECTS += $(OBJDIR)/CXMLReader.o
+OBJECTS += $(OBJDIR)/CXMLWriter.o
+OBJECTS += $(OBJDIR)/CZipReader.o
+OBJECTS += $(OBJDIR)/os.o
+
+# Rules
+# #############################################
+
+all: $(TARGET)
+	@:
+
+$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+	$(PRELINKCMDS)
 	@echo Linking irrlicht
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
-
-$(CUSTOMFILES): | $(OBJDIR)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
@@ -131,62 +114,71 @@ clean:
 	@echo Cleaning irrlicht
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
+	$(SILENT) rm -rf $(GENERATED)
 	$(SILENT) rm -rf $(OBJDIR)
 else
 	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
+	$(SILENT) if exist $(subst /,\\,$(GENERATED)) del /s /q $(subst /,\\,$(GENERATED))
 	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
 endif
 
-prebuild:
+prebuild: | $(OBJDIR)
 	$(PREBUILDCMDS)
 
-prelink:
-	$(PRELINKCMDS)
-
 ifneq (,$(PCH))
-$(OBJECTS): $(GCH) $(PCH) | $(OBJDIR)
-$(GCH): $(PCH) | $(OBJDIR)
+$(OBJECTS): $(GCH) | $(PCH_PLACEHOLDER)
+$(GCH): $(PCH) | prebuild
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) -x c++-header $(ALL_CXXFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
+$(PCH_PLACEHOLDER): $(GCH) | $(OBJDIR)
+ifeq (posix,$(SHELLTYPE))
+	$(SILENT) touch "$@"
 else
-$(OBJECTS): | $(OBJDIR)
+	$(SILENT) echo $null >> "$@"
+endif
+else
+$(OBJECTS): | prebuild
 endif
 
+
+# File Rules
+# #############################################
+
 $(OBJDIR)/CAttributes.o: ../../irrlicht/source/Irrlicht/CAttributes.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CFileList.o: ../../irrlicht/source/Irrlicht/CFileList.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CFileSystem.o: ../../irrlicht/source/Irrlicht/CFileSystem.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CLimitReadFile.o: ../../irrlicht/source/Irrlicht/CLimitReadFile.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CMemoryFile.o: ../../irrlicht/source/Irrlicht/CMemoryFile.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CReadFile.o: ../../irrlicht/source/Irrlicht/CReadFile.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CWriteFile.o: ../../irrlicht/source/Irrlicht/CWriteFile.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CXMLReader.o: ../../irrlicht/source/Irrlicht/CXMLReader.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CXMLWriter.o: ../../irrlicht/source/Irrlicht/CXMLWriter.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/CZipReader.o: ../../irrlicht/source/Irrlicht/CZipReader.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/os.o: ../../irrlicht/source/Irrlicht/os.cpp
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
-  -include $(OBJDIR)/$(notdir $(PCH)).d
+  -include $(PCH_PLACEHOLDER).d
 endif
