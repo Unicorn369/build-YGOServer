@@ -23,10 +23,10 @@ end
         files { "serverapi.cpp", "serverapi.h"}
     end
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", LUA_LIB_NAME, "sqlite3", "event" }
+    links { "ocgcore", "clzma", "lua", "sqlite3", "event" }
     if SERVER_ZIP_SUPPORT then
         defines { "SERVER_ZIP_SUPPORT" }
-        links { "irrlicht", "cspmemvfs" }
+        links { "irrlicht", "cspmemvfs", "z" }
         if BUILD_IRRLICHT then
             includedirs { "../irrlicht/source/Irrlicht" }
         end
@@ -50,6 +50,7 @@ end
     else
         includedirs { EVENT_INCLUDE_DIR }
         libdirs { EVENT_LIB_DIR }
+        links { "event_pthreads" }
         --if os.istarget("windows") then
         --    links { "Bcrypt", "Iphlpapi" }
         --end
@@ -90,9 +91,7 @@ end
     filter "not action:vs*"
         buildoptions { "-std=c++14", "-fno-rtti" }
     filter "not system:windows"
-        links { "event_pthreads", "dl", "pthread" }
-    filter "system:macosx"
-        linkoptions  { "-arch x86_64", "-arch arm64" }
+        links { "dl", "pthread" }
 if not SERVER_MODE then
         links { "z" }
         defines { "GL_SILENCE_DEPRECATION" }

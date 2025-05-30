@@ -6,7 +6,7 @@ project "ocgcore"
     links { LUA_LIB_NAME }
     
     if BUILD_LUA then
-        includedirs { "../lua" }
+        includedirs { "../lua/src" }
     else
         includedirs { LUA_INCLUDE_DIR }
         libdirs { LUA_LIB_DIR }
