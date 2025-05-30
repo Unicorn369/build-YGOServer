@@ -8,99 +8,109 @@ ifndef verbose
   SILENT = @
 endif
 
-.PHONY: clean prebuild prelink
-
-ifeq ($(config),release)
-  RESCOMP = windres
-  TARGETDIR = bin/Release
-  TARGET = $(TARGETDIR)/libevent.a
-  OBJDIR = obj/Release/event
-  DEFINES += -DNDEBUG
-  INCLUDES += -I../../libevent/include -I../../libevent/compat -I../../libevent/linux
-  FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -march=native -fno-strict-aliasing -Wno-multichar -Wno-format-security
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -march=native -fno-strict-aliasing -Wno-multichar -Wno-format-security
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS +=
-  LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-ifeq ($(config),debug)
-  RESCOMP = windres
-  TARGETDIR = bin/Debug
-  TARGET = $(TARGETDIR)/libevent.a
-  OBJDIR = obj/Debug/event
-  DEFINES += -D_DEBUG
-  INCLUDES += -I../../libevent/include -I../../libevent/compat -I../../libevent/linux
-  FORCE_INCLUDE +=
-  ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security
-  ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS +=
-  LDDEPS +=
-  ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-all: prebuild prelink $(TARGET)
-	@:
-
-endif
-
-OBJECTS := \
-	$(OBJDIR)/evthread_pthread.o \
-	$(OBJDIR)/buffer.o \
-	$(OBJDIR)/bufferevent.o \
-	$(OBJDIR)/bufferevent_filter.o \
-	$(OBJDIR)/bufferevent_pair.o \
-	$(OBJDIR)/bufferevent_ratelim.o \
-	$(OBJDIR)/bufferevent_sock.o \
-	$(OBJDIR)/epoll.o \
-	$(OBJDIR)/event.o \
-	$(OBJDIR)/evmap.o \
-	$(OBJDIR)/evthread.o \
-	$(OBJDIR)/evutil.o \
-	$(OBJDIR)/evutil_rand.o \
-	$(OBJDIR)/evutil_time.o \
-	$(OBJDIR)/listener.o \
-	$(OBJDIR)/log.o \
-	$(OBJDIR)/poll.o \
-	$(OBJDIR)/select.o \
-	$(OBJDIR)/signal.o \
-	$(OBJDIR)/strlcpy.o \
-
-RESOURCES := \
-
-CUSTOMFILES := \
+.PHONY: clean prebuild
 
 SHELLTYPE := posix
-ifeq (.exe,$(findstring .exe,$(ComSpec)))
+ifeq ($(shell echo "test"), "test")
 	SHELLTYPE := msdos
 endif
 
-$(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR)
+# Configurations
+# #############################################
+
+ifeq ($(origin CC), default)
+  CC = gcc
+endif
+ifeq ($(origin CXX), default)
+  CXX = g++
+endif
+ifeq ($(origin AR), default)
+  AR = ar
+endif
+RESCOMP = windres
+TARGETDIR = bin
+TARGET = $(TARGETDIR)/libevent.a
+OBJDIR = obj/Release/event
+DEFINES += -DNDEBUG
+INCLUDES += -I../../libevent/include -I../../libevent/compat -I../../libevent/linux
+FORCE_INCLUDE +=
+ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+LIBS +=
+LDDEPS +=
+ALL_LDFLAGS += $(LDFLAGS)
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+define PREBUILDCMDS
+endef
+define PRELINKCMDS
+endef
+define POSTBUILDCMDS
+endef
+
+# Per File Configurations
+# #############################################
+
+
+# File sets
+# #############################################
+
+GENERATED :=
+OBJECTS :=
+
+GENERATED += $(OBJDIR)/buffer.o
+GENERATED += $(OBJDIR)/bufferevent.o
+GENERATED += $(OBJDIR)/bufferevent_filter.o
+GENERATED += $(OBJDIR)/bufferevent_pair.o
+GENERATED += $(OBJDIR)/bufferevent_ratelim.o
+GENERATED += $(OBJDIR)/bufferevent_sock.o
+GENERATED += $(OBJDIR)/epoll.o
+GENERATED += $(OBJDIR)/event.o
+GENERATED += $(OBJDIR)/evmap.o
+GENERATED += $(OBJDIR)/evthread.o
+GENERATED += $(OBJDIR)/evthread_pthread.o
+GENERATED += $(OBJDIR)/evutil.o
+GENERATED += $(OBJDIR)/evutil_rand.o
+GENERATED += $(OBJDIR)/evutil_time.o
+GENERATED += $(OBJDIR)/listener.o
+GENERATED += $(OBJDIR)/log.o
+GENERATED += $(OBJDIR)/poll.o
+GENERATED += $(OBJDIR)/select.o
+GENERATED += $(OBJDIR)/signal.o
+GENERATED += $(OBJDIR)/strlcpy.o
+OBJECTS += $(OBJDIR)/buffer.o
+OBJECTS += $(OBJDIR)/bufferevent.o
+OBJECTS += $(OBJDIR)/bufferevent_filter.o
+OBJECTS += $(OBJDIR)/bufferevent_pair.o
+OBJECTS += $(OBJDIR)/bufferevent_ratelim.o
+OBJECTS += $(OBJDIR)/bufferevent_sock.o
+OBJECTS += $(OBJDIR)/epoll.o
+OBJECTS += $(OBJDIR)/event.o
+OBJECTS += $(OBJDIR)/evmap.o
+OBJECTS += $(OBJDIR)/evthread.o
+OBJECTS += $(OBJDIR)/evthread_pthread.o
+OBJECTS += $(OBJDIR)/evutil.o
+OBJECTS += $(OBJDIR)/evutil_rand.o
+OBJECTS += $(OBJDIR)/evutil_time.o
+OBJECTS += $(OBJDIR)/listener.o
+OBJECTS += $(OBJDIR)/log.o
+OBJECTS += $(OBJDIR)/poll.o
+OBJECTS += $(OBJDIR)/select.o
+OBJECTS += $(OBJDIR)/signal.o
+OBJECTS += $(OBJDIR)/strlcpy.o
+
+# Rules
+# #############################################
+
+all: $(TARGET)
+	@:
+
+$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+	$(PRELINKCMDS)
 	@echo Linking event
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
-
-$(CUSTOMFILES): | $(OBJDIR)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
@@ -122,89 +132,98 @@ clean:
 	@echo Cleaning event
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
+	$(SILENT) rm -rf $(GENERATED)
 	$(SILENT) rm -rf $(OBJDIR)
 else
 	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
+	$(SILENT) if exist $(subst /,\\,$(GENERATED)) del /s /q $(subst /,\\,$(GENERATED))
 	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
 endif
 
-prebuild:
+prebuild: | $(OBJDIR)
 	$(PREBUILDCMDS)
 
-prelink:
-	$(PRELINKCMDS)
-
 ifneq (,$(PCH))
-$(OBJECTS): $(GCH) $(PCH) | $(OBJDIR)
-$(GCH): $(PCH) | $(OBJDIR)
+$(OBJECTS): $(GCH) | $(PCH_PLACEHOLDER)
+$(GCH): $(PCH) | prebuild
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) -x c++-header $(ALL_CXXFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
+$(PCH_PLACEHOLDER): $(GCH) | $(OBJDIR)
+ifeq (posix,$(SHELLTYPE))
+	$(SILENT) touch "$@"
 else
-$(OBJECTS): | $(OBJDIR)
+	$(SILENT) echo $null >> "$@"
+endif
+else
+$(OBJECTS): | prebuild
 endif
 
-$(OBJDIR)/evthread_pthread.o: ../../libevent/evthread_pthread.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+
+# File Rules
+# #############################################
+
 $(OBJDIR)/buffer.o: ../../libevent/buffer.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/bufferevent.o: ../../libevent/bufferevent.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/bufferevent_filter.o: ../../libevent/bufferevent_filter.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/bufferevent_pair.o: ../../libevent/bufferevent_pair.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/bufferevent_ratelim.o: ../../libevent/bufferevent_ratelim.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/bufferevent_sock.o: ../../libevent/bufferevent_sock.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/epoll.o: ../../libevent/epoll.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/event.o: ../../libevent/event.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/evmap.o: ../../libevent/evmap.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/evthread.o: ../../libevent/evthread.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/evthread_pthread.o: ../../libevent/evthread_pthread.c
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/evutil.o: ../../libevent/evutil.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/evutil_rand.o: ../../libevent/evutil_rand.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/evutil_time.o: ../../libevent/evutil_time.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/listener.o: ../../libevent/listener.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/log.o: ../../libevent/log.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/poll.o: ../../libevent/poll.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/select.o: ../../libevent/select.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/signal.o: ../../libevent/signal.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/strlcpy.o: ../../libevent/strlcpy.c
-	@echo $(notdir $<)
+	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
-  -include $(OBJDIR)/$(notdir $(PCH)).d
+  -include $(PCH_PLACEHOLDER).d
 endif

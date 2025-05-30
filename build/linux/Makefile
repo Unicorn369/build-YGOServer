@@ -13,29 +13,22 @@ ifeq ($(config),release)
   clzma_config = release
   cspmemvfs_config = release
   ygopro_config = release
+  irrlicht_config = release
   event_config = release
   lua_config = release
-  irrlicht_config = release
   sqlite3_config = release
-endif
-ifeq ($(config),debug)
-  ocgcore_config = debug
-  clzma_config = debug
-  cspmemvfs_config = debug
-  ygopro_config = debug
-  event_config = debug
-  lua_config = debug
-  irrlicht_config = debug
-  sqlite3_config = debug
+
+else
+  $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := ocgcore clzma cspmemvfs ygopro event lua irrlicht sqlite3
+PROJECTS := ocgcore clzma cspmemvfs ygopro irrlicht event lua sqlite3
 
 .PHONY: all clean help $(PROJECTS) 
 
 all: $(PROJECTS)
 
-ocgcore: lua
+ocgcore:
 ifneq (,$(ocgcore_config))
 	@echo "==== Building ocgcore ($(ocgcore_config)) ===="
 	@${MAKE} --no-print-directory -C . -f ocgcore.make config=$(ocgcore_config)
@@ -53,10 +46,16 @@ ifneq (,$(cspmemvfs_config))
 	@${MAKE} --no-print-directory -C . -f cspmemvfs.make config=$(cspmemvfs_config)
 endif
 
-ygopro: ocgcore clzma event lua sqlite3 irrlicht cspmemvfs
+ygopro: ocgcore clzma lua sqlite3 event irrlicht cspmemvfs
 ifneq (,$(ygopro_config))
 	@echo "==== Building ygopro ($(ygopro_config)) ===="
 	@${MAKE} --no-print-directory -C . -f ygopro.make config=$(ygopro_config)
+endif
+
+irrlicht:
+ifneq (,$(irrlicht_config))
+	@echo "==== Building irrlicht ($(irrlicht_config)) ===="
+	@${MAKE} --no-print-directory -C . -f irrlicht.make config=$(irrlicht_config)
 endif
 
 event:
@@ -71,12 +70,6 @@ ifneq (,$(lua_config))
 	@${MAKE} --no-print-directory -C . -f lua.make config=$(lua_config)
 endif
 
-irrlicht:
-ifneq (,$(irrlicht_config))
-	@echo "==== Building irrlicht ($(irrlicht_config)) ===="
-	@${MAKE} --no-print-directory -C . -f irrlicht.make config=$(irrlicht_config)
-endif
-
 sqlite3:
 ifneq (,$(sqlite3_config))
 	@echo "==== Building sqlite3 ($(sqlite3_config)) ===="
@@ -88,9 +81,9 @@ clean:
 	@${MAKE} --no-print-directory -C . -f clzma.make clean
 	@${MAKE} --no-print-directory -C . -f cspmemvfs.make clean
 	@${MAKE} --no-print-directory -C . -f ygopro.make clean
+	@${MAKE} --no-print-directory -C . -f irrlicht.make clean
 	@${MAKE} --no-print-directory -C . -f event.make clean
 	@${MAKE} --no-print-directory -C . -f lua.make clean
-	@${MAKE} --no-print-directory -C . -f irrlicht.make clean
 	@${MAKE} --no-print-directory -C . -f sqlite3.make clean
 
 help:
@@ -98,7 +91,6 @@ help:
 	@echo ""
 	@echo "CONFIGURATIONS:"
 	@echo "  release"
-	@echo "  debug"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
@@ -107,9 +99,9 @@ help:
 	@echo "   clzma"
 	@echo "   cspmemvfs"
 	@echo "   ygopro"
+	@echo "   irrlicht"
 	@echo "   event"
 	@echo "   lua"
-	@echo "   irrlicht"
 	@echo "   sqlite3"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"
