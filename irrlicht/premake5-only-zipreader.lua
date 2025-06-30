@@ -5,7 +5,6 @@ project "irrlicht"
 
     defines {
         "_IRR_STATIC_LIB_",
-        "NO_IRR_USE_NON_SYSTEM_ZLIB_",
         "NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
         "NO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_",
@@ -33,4 +32,13 @@ project "irrlicht"
     }
 
     filter { "system:windows" }
-        defines { "_IRR_WCHAR_FILESYSTEM" }
+        defines { "_IRR_WCHAR_FILESYSTEM", "NO_IRR_USE_NON_SYSTEM_ZLIB_" }
+        includedirs { "source/Irrlicht/zlib" }
+        files {
+            "source/Irrlicht/zlib/adler32.c",
+            "source/Irrlicht/zlib/crc32.c",
+            "source/Irrlicht/zlib/inffast.c",
+            "source/Irrlicht/zlib/inflate.c",
+            "source/Irrlicht/zlib/inftrees.c",
+            "source/Irrlicht/zlib/zutil.c"
+        }
