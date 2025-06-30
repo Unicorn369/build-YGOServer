@@ -12,10 +12,6 @@ extern unsigned short replay_mode;
 #endif
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
-#ifdef YGOPRO_SERVER_MODE
-	cache_recorder = 0;
-	replay_recorder = 0;
-#endif
 }
 SingleDuel::~SingleDuel() {
 }
@@ -404,6 +400,13 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	else if (len < (2 + deckbuf.mainc + deckbuf.sidec) * (int)sizeof(int32_t))
 		valid = false;
 	if (!valid) {
+#ifdef YGOPRO_SERVER_MODE
+		if(duel_count == 0) {
+			STOC_HS_PlayerChange scpc;
+			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
+			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
+		}
+#endif
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
 		scem.code = 0;
@@ -412,6 +415,9 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, unsigned char* pdata, int len) {
 	}
 	if(duel_count == 0) {
 		deck_error[dp->type] = DeckManager::LoadDeck(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec);
+#ifdef YGOPRO_SERVER_MODE
+		PlayerReady(dp, true);
+#endif
 	} else {
 		if(DeckManager::LoadSide(pdeck[dp->type], deckbuf.list, deckbuf.mainc, deckbuf.sidec)) {
 			ready[dp->type] = true;
@@ -535,20 +541,19 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	dp->state = CTOS_RESPONSE;
 	std::random_device rd;
-	unsigned int seed = rd();
+	ExtendedReplayHeader rh;
+	rh.base.id = REPLAY_ID_YRP2;
+	rh.base.version = PRO_VERSION;
+	rh.base.flag = REPLAY_UNIFORM;
+	rh.base.start_time = (uint32_t)std::time(nullptr);
 #ifdef YGOPRO_SERVER_MODE
-	if(pre_seed[duel_count] > 0) {
-		seed = pre_seed[duel_count];
-	}
+	if (pre_seed_specified[duel_count])
+		memcpy(rh.seed_sequence, pre_seed[duel_count], SEED_COUNT * sizeof(uint32_t));
+	else
 #endif
-	mt19937 rnd((uint_fast32_t)seed);
-	auto duel_seed = rnd.rand();
-	ReplayHeader rh;
-	rh.id = 0x31707279;
-	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_UNIFORM;
-	rh.seed = seed;
-	rh.start_time = (unsigned int)std::time(nullptr);
+	for (auto& x : rh.seed_sequence)
+		x = rd();
+	mtrandom rnd(rh.seed_sequence, SEED_COUNT);
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	last_replay.WriteData(players[0]->name, 40, false);
@@ -562,7 +567,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	set_script_reader(DataManager::ScriptReaderEx);
 	set_card_reader(DataManager::CardReader);
 	set_message_handler(SingleDuel::MessageHandler);
-	pduel = create_duel(duel_seed);
+	pduel = create_duel_v2(rh.seed_sequence);
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 #ifdef YGOPRO_SERVER_MODE
@@ -615,6 +620,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		NetServer::SendBufferToPlayer(replay_recorder, STOC_GAME_MSG, startbuf, 19);
 	turn_player = 0;
 	phase = 1;
+	deck_reversed = false;
 #endif
 	RefreshExtra(0);
 	RefreshExtra(1);
@@ -929,7 +935,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadUInt8(pbuf);
-			pbuf += 10 + count * 13;
+			pbuf += 9 + count * 14;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
@@ -1006,6 +1012,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 		}
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadUInt8(pbuf);
+			pbuf += 1;
 			count = BufferIO::ReadUInt8(pbuf);
 			if(pbuf[5] != LOCATION_DECK) {
 				pbuf += count * 7;
@@ -1099,6 +1106,7 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 #ifdef YGOPRO_SERVER_MODE
 			NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
+			deck_reversed = !deck_reversed;
 #endif
 			break;
 		}
@@ -1796,10 +1804,10 @@ void SingleDuel::EndDuel() {
 		return;
 	last_replay.EndRecord();
 	char replaybuf[0x2000], *pbuf = replaybuf;
-	std::memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
-	pbuf += sizeof(ReplayHeader);
+	std::memcpy(pbuf, &last_replay.pheader, sizeof last_replay.pheader);
+	pbuf += sizeof last_replay.pheader;
 	std::memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
-	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
+	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof last_replay.pheader + last_replay.comp_size);
 	NetServer::ReSendToPlayer(players[1]);
 #ifdef YGOPRO_SERVER_MODE
 	if(!(replay_mode & REPLAY_MODE_WATCHER_NO_SEND)) {
@@ -1833,39 +1841,47 @@ void SingleDuel::WaitforResponse(int playerid) {
 void SingleDuel::RequestField(DuelPlayer* dp) {
 	if(dp->type > 1)
 		return;
-	int player = dp->type;
+	uint8_t player = dp->type;
 	NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 
-	unsigned char startbuf[32], *pbuf = startbuf;
-	BufferIO::WriteInt8(pbuf, MSG_START);
-	BufferIO::WriteInt8(pbuf, player);
-	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt16(pbuf, 0);
-	BufferIO::WriteInt16(pbuf, 0);
-	BufferIO::WriteInt16(pbuf, 0);
-	BufferIO::WriteInt16(pbuf, 0);
-	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 19);
+	uint8_t buf[1024];
+	uint8_t* temp_buf = buf;
+	auto WriteMsg = [&](const std::function<void(uint8_t*&)> &writer) {
+		temp_buf = buf;
+		writer(temp_buf);
+		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, buf, temp_buf - buf);
+	};
 
-	int newturn_count = 1;
-	if(turn_player == 1)
-		newturn_count = 2;
-	for(int i = 0; i < newturn_count; i++) {
-		unsigned char turnbuf[2], *pbuf_t = turnbuf;
-		BufferIO::WriteInt8(pbuf_t, MSG_NEW_TURN);
-		BufferIO::WriteInt8(pbuf_t, i);
-		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, turnbuf, 2);		
+	WriteMsg([&](uint8_t*& pbuf) {
+		BufferIO::WriteInt8(pbuf, MSG_START);
+		BufferIO::WriteInt8(pbuf, player);
+		BufferIO::WriteInt8(pbuf, host_info.duel_rule);
+		BufferIO::WriteInt32(pbuf, host_info.start_lp);
+		BufferIO::WriteInt32(pbuf, host_info.start_lp);
+		BufferIO::WriteInt16(pbuf, 0);
+		BufferIO::WriteInt16(pbuf, 0);
+		BufferIO::WriteInt16(pbuf, 0);
+		BufferIO::WriteInt16(pbuf, 0);
+	});
+
+	uint8_t newturn_count = (turn_player == 1) ? 2 : 1;
+	for (uint8_t i = 0; i < newturn_count; ++i) {
+		WriteMsg([&](uint8_t*& pbuf) {
+			BufferIO::WriteInt8(pbuf, MSG_NEW_TURN);
+			BufferIO::WriteInt8(pbuf, i);
+		});
 	}
 
-	unsigned char phasebuf[4], *pbuf_p = phasebuf;
-	BufferIO::WriteInt8(pbuf_p, MSG_NEW_PHASE);
-	BufferIO::WriteInt16(pbuf_p, phase);
-	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
+	WriteMsg([&](uint8_t*& pbuf) {
+		BufferIO::WriteInt8(pbuf, MSG_NEW_PHASE);
+		BufferIO::WriteInt16(pbuf, phase);
+	});
 
-	unsigned char query_buffer[1024];
-	int length = query_field_info(pduel, (unsigned char*)query_buffer);
-	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
+	WriteMsg([&](uint8_t*& pbuf) {
+		auto length = query_field_info(pduel, pbuf);
+		pbuf += length;
+	});
+
 	RefreshMzone(1 - player, 0xefffff, 0, dp);
 	RefreshMzone(player, 0xefffff, 0, dp);
 	RefreshSzone(1 - player, 0xefffff, 0, dp);
@@ -1878,6 +1894,42 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	RefreshExtra(player, 0xefffff, 0, dp);
 	RefreshRemoved(1 - player, 0xefffff, 0, dp);
 	RefreshRemoved(player, 0xefffff, 0, dp);
+
+	// send MSG_REVERSE_DECK if deck is reversed
+	if(deck_reversed)
+		WriteMsg([&](uint8_t*& pbuf) {
+			BufferIO::WriteInt8(pbuf, MSG_REVERSE_DECK);
+		});
+
+	uint8_t query_buffer[SIZE_QUERY_BUFFER];
+	for(uint8_t i = 0; i < 2; ++i) {
+		// get decktop card
+		auto qlen = query_field_card(pduel, i, LOCATION_DECK, QUERY_CODE | QUERY_POSITION, query_buffer, 0);
+		if(!qlen)
+			continue; // no cards in deck
+		uint8_t *qbuf = query_buffer;
+		uint32_t code = 0;
+		uint32_t position = 0;
+		while(qbuf < query_buffer + qlen) {
+			auto clen = BufferIO::ReadInt32(qbuf);
+			if(qbuf + clen - 4 == query_buffer + qlen) {
+				// last card
+				code = *(uint32_t*)(qbuf + 4);
+				position = GetPosition(qbuf, 8);
+			}
+			qbuf += clen - 4;
+		}
+		if(position & POS_FACEUP)
+			code |= 0x80000000; // mark as reversed
+		if(deck_reversed || position & POS_FACEUP)
+			WriteMsg([&](uint8_t*& pbuf) {
+				BufferIO::WriteInt8(pbuf, MSG_DECK_TOP);
+				BufferIO::WriteInt8(pbuf, i);
+				BufferIO::WriteInt8(pbuf, 0);
+				BufferIO::WriteInt32(pbuf, code);
+			});
+	}
+
 	/*
 	if(dp == players[last_response])
 		WaitforResponse(last_response);
