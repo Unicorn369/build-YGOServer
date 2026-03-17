@@ -13,7 +13,7 @@ end
 
     files { "gframe.cpp", "config.h",
             "game.cpp", "game.h", "myfilesystem.h",
-            "deck_manager.cpp", "deck_manager.h",
+            "deck_manager.cpp", "deck_manager.h", "deck.h",
             "data_manager.cpp", "data_manager.h",
             "replay.cpp", "replay.h",
             "netserver.cpp", "netserver.h",

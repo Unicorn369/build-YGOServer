@@ -1,100 +1,118 @@
 #include "data_manager.h"
 #include "game.h"
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
+#include "client_card.h"
 #include "spmemvfs/spmemvfs.h"
 #endif
 
 namespace ygo {
 
-const wchar_t* DataManager::unknown_string = L"???";
 unsigned char DataManager::scriptBuffer[0x100000] = {};
-#if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
-irr::io::IFileSystem* DataManager::FileSystem = nullptr;
-#endif
 DataManager dataManager;
+#ifdef YGOPRO_SERVER_MODE
+static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category FROM datas";
+#else
+static const char SELECT_STMT[] = "SELECT datas.id, datas.ot, datas.alias, datas.setcode, datas.type, datas.atk, datas.def, datas.level, datas.race, datas.attribute, datas.category,"
+" texts.name, texts.desc, texts.str1, texts.str2, texts.str3, texts.str4, texts.str5, texts.str6, texts.str7, texts.str8,"
+" texts.str9, texts.str10, texts.str11, texts.str12, texts.str13, texts.str14, texts.str15, texts.str16 FROM datas INNER JOIN texts ON datas.id = texts.id";
+#endif
+static constexpr int DATAS_COUNT = 11;
+
+static constexpr int CARD_ARTWORK_VERSIONS_OFFSET = 20;
+static inline bool is_alternative(uint32_t code, uint32_t alias) {
+	return alias && (alias < code + CARD_ARTWORK_VERSIONS_OFFSET) && (code < alias + CARD_ARTWORK_VERSIONS_OFFSET);
+}
 
 DataManager::DataManager() : _datas(32768), _strings(32768) {
-	extra_setcode = { {8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}}, };
+	extra_setcode = { 
+		{8512558u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+		{55088578u, {0x8f, 0x54, 0x59, 0x82, 0x13a}},
+	};
 }
 bool DataManager::ReadDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt = nullptr;
-#ifdef YGOPRO_SERVER_MODE
-	const char* sql = "select * from datas";
-#else
-	const char* sql = "select * from datas,texts where datas.id=texts.id";
-#endif
-	if (sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+	int texts_offset = DATAS_COUNT;
+	if (sqlite3_prepare_v2(pDB, SELECT_STMT, -1, &pStmt, nullptr) != SQLITE_OK)
 		return Error(pDB, pStmt);
 #ifndef YGOPRO_SERVER_MODE
 	wchar_t strBuffer[4096];
 #endif
-	int step = 0;
-	do {
-		CardDataC cd;
-		CardString cs;
-		step = sqlite3_step(pStmt);
-		if (step == SQLITE_ROW) {
-			cd.code = sqlite3_column_int(pStmt, 0);
-			cd.ot = sqlite3_column_int(pStmt, 1);
-			cd.alias = sqlite3_column_int(pStmt, 2);
-			uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
-			if (setcode) {
-				auto it = extra_setcode.find(cd.code);
-				if (it != extra_setcode.end()) {
-					int len = it->second.size();
-					if (len > SIZE_SETCODE)
-						len = SIZE_SETCODE;
-					if (len)
-						std::memcpy(cd.setcode, it->second.data(), len * sizeof(uint16_t));
-				}
-				else
-					cd.set_setcode(setcode);
-			}
-			cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
-			cd.attack = sqlite3_column_int(pStmt, 5);
-			cd.defense = sqlite3_column_int(pStmt, 6);
-			if (cd.type & TYPE_LINK) {
-				cd.link_marker = cd.defense;
-				cd.defense = 0;
-			}
-			else
-				cd.link_marker = 0;
-			uint32_t level = static_cast<uint32_t>(sqlite3_column_int(pStmt, 7));
-			cd.level = level & 0xff;
-			cd.lscale = (level >> 24) & 0xff;
-			cd.rscale = (level >> 16) & 0xff;
-			cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
-			cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
-			cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
-			_datas[cd.code] = cd;
-#ifndef YGOPRO_SERVER_MODE
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.name = strBuffer;
-			}
-			if (const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.text = strBuffer;
-			}
-			constexpr int desc_count = sizeof cs.desc / sizeof cs.desc[0];
-			for (int i = 0; i < desc_count; ++i) {
-				if (const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
-					BufferIO::DecodeUTF8(text, strBuffer);
-					cs.desc[i] = strBuffer;
-				}
-			}
-			_strings[cd.code] = cs;
-#endif //YGOPRO_SERVER_MODE
-		}
-		else if (step != SQLITE_DONE)
+	for (int step = sqlite3_step(pStmt); step != SQLITE_DONE; step = sqlite3_step(pStmt)) {
+		if (step != SQLITE_ROW)
 			return Error(pDB, pStmt);
-	} while (step == SQLITE_ROW);
+		uint32_t code = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 0));
+		auto& cd = _datas[code];
+		cd.code = code;
+		cd.ot = sqlite3_column_int(pStmt, 1);
+		cd.alias = sqlite3_column_int(pStmt, 2);
+		uint64_t setcode = static_cast<uint64_t>(sqlite3_column_int64(pStmt, 3));
+		write_setcode(cd.setcode, setcode);
+		cd.type = static_cast<decltype(cd.type)>(sqlite3_column_int64(pStmt, 4));
+		cd.attack = sqlite3_column_int(pStmt, 5);
+		cd.defense = sqlite3_column_int(pStmt, 6);
+		if (cd.type & TYPE_LINK) {
+			cd.link_marker = cd.defense;
+			cd.defense = 0;
+		}
+		else
+			cd.link_marker = 0;
+		uint32_t level = static_cast<uint32_t>(sqlite3_column_int64(pStmt, 7));
+		cd.level = level & 0xff;
+		cd.lscale = (level >> 24) & 0xff;
+		cd.rscale = (level >> 16) & 0xff;
+		cd.race = static_cast<decltype(cd.race)>(sqlite3_column_int64(pStmt, 8));
+		cd.attribute = static_cast<decltype(cd.attribute)>(sqlite3_column_int64(pStmt, 9));
+		cd.category = static_cast<decltype(cd.category)>(sqlite3_column_int64(pStmt, 10));
+		// rule_code
+		if (cd.code == 5405695) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
+		}
+		else if (cd.alias && !(cd.type & TYPE_TOKEN) && !is_alternative(cd.code, cd.alias)) {
+			cd.rule_code = cd.alias;
+			cd.alias = 0;
+		}
+#ifndef YGOPRO_SERVER_MODE
+		auto& cs = _strings[code];
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 0)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.name = strBuffer;
+		}
+		if (const char* text = (const char*)sqlite3_column_text(pStmt, texts_offset + 1)) {
+			BufferIO::DecodeUTF8(text, strBuffer);
+			cs.text = strBuffer;
+		}
+		for (int i = 0; i < DESC_COUNT; ++i) {
+			if (const char* text = (const char*)sqlite3_column_text(pStmt, (texts_offset + 2) + i)) {
+				BufferIO::DecodeUTF8(text, strBuffer);
+				cs.desc[i] = strBuffer;
+			}
+		}
+#endif //YGOPRO_SERVER_MODE
+	}
 	sqlite3_finalize(pStmt);
+	for (auto& entry : _datas) {
+		auto& cd = entry.second;
+		if (cd.rule_code || !cd.alias || (cd.type & TYPE_TOKEN))
+			continue;
+		auto it = _datas.find(cd.alias);
+		if (it == _datas.end())
+			continue;
+		cd.rule_code = it->second.rule_code;
+	}
+	for (const auto& entry : extra_setcode) {
+		const auto& code = entry.first;
+		const auto& list = entry.second;
+		if (list.size() > SIZE_SETCODE || list.empty())
+			continue;
+		auto it = _datas.find(code);
+		if (it == _datas.end())
+			continue;
+		std::memcpy(it->second.setcode, list.data(), list.size() * sizeof(uint16_t));
+	}
 	return true;
 }
-bool DataManager::LoadDB(const wchar_t* wfile) {
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
+bool DataManager::LoadDB(const char* file) {
 #if defined(YGOPRO_SERVER_MODE) && !defined(SERVER_ZIP_SUPPORT)
 	bool ret{};
 	sqlite3* pDB{};
@@ -104,21 +122,16 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 		ret = ReadDB(pDB);
 	sqlite3_close(pDB);
 #else
-#ifdef _WIN32
-	auto reader = FileSystem->createAndOpenFile(wfile);
-#else
 	auto reader = FileSystem->createAndOpenFile(file);
-#endif
 	if(reader == nullptr)
 		return false;
 	spmemvfs_db_t db;
 	spmembuffer_t* mem = (spmembuffer_t*)std::calloc(sizeof(spmembuffer_t), 1);
 	spmemvfs_env_init();
 	mem->total = mem->used = reader->getSize();
-	mem->data = (char*)std::malloc(mem->total + 1);
+	mem->data = (char*)std::malloc(mem->total);
 	reader->read(mem->data, mem->total);
 	reader->drop();
-	(mem->data)[mem->total] = '\0';
 	bool ret{};
 	if (spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
 		ret = Error(db.handle);
@@ -189,42 +202,32 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 #endif //YGOPRO_SERVER_MODE
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	std::snprintf(errmsg, sizeof errmsg, "%s", sqlite3_errmsg(pDB));
-	if(pStmt)
-		sqlite3_finalize(pStmt);
+	if (const char* msg = sqlite3_errmsg(pDB))
+		mysnprintf(errmsg, "%s", msg);
+	else
+		errmsg[0] = '\0';
+	sqlite3_finalize(pStmt);
 	return false;
 }
-code_pointer DataManager::GetCodePointer(unsigned int code) const {
+code_pointer DataManager::GetCodePointer(uint32_t code) const {
 	return _datas.find(code);
 }
 #ifndef YGOPRO_SERVER_MODE
-string_pointer DataManager::GetStringPointer(unsigned int code) const {
+string_pointer DataManager::GetStringPointer(uint32_t code) const {
 	return _strings.find(code);
 }
-code_pointer DataManager::datas_begin() const {
-	return _datas.cbegin();
-}
-code_pointer DataManager::datas_end() const {
-	return _datas.cend();
-}
-string_pointer DataManager::strings_begin() const {
-	return _strings.cbegin();
-}
-string_pointer DataManager::strings_end() const {
-	return _strings.cend();
-}
 #endif //YGOPRO_SERVER_MODE
-bool DataManager::GetData(unsigned int code, CardData* pData) const {
+bool DataManager::GetData(uint32_t code, CardData* pData) const {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
 	if (pData) {
-		*pData = cdit->second;
+		std::memcpy(pData, &cdit->second, sizeof(CardData));
 	}
 	return true;
 }
 #ifndef YGOPRO_SERVER_MODE
-bool DataManager::GetString(unsigned int code, CardString* pStr) const {
+bool DataManager::GetString(uint32_t code, CardString* pStr) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
 		pStr->name = unknown_string;
@@ -234,7 +237,7 @@ bool DataManager::GetString(unsigned int code, CardString* pStr) const {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(unsigned int code) const {
+const wchar_t* DataManager::GetName(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -242,7 +245,7 @@ const wchar_t* DataManager::GetName(unsigned int code) const {
 		return csit->second.name.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetText(unsigned int code) const {
+const wchar_t* DataManager::GetText(uint32_t code) const {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
@@ -250,7 +253,7 @@ const wchar_t* DataManager::GetText(unsigned int code) const {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(unsigned int strCode) const {
+const wchar_t* DataManager::GetDesc(uint32_t strCode) const {
 	if (strCode < (MIN_CARD_ID << 4))
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
@@ -262,45 +265,51 @@ const wchar_t* DataManager::GetDesc(unsigned int strCode) const {
 		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetSysString(int code) const {
-	if (code < 0 || code > MAX_STRING_ID)
-		return unknown_string;
-	auto csit = _sysStrings.find(code);
-	if(csit == _sysStrings.end())
+const wchar_t* DataManager::GetMapString(const wstring_map& table, uint32_t code) const {
+	auto csit = table.find(code);
+	if (csit == table.end())
 		return unknown_string;
 	return csit->second.c_str();
 }
-const wchar_t* DataManager::GetVictoryString(int code) const {
-	auto csit = _victoryStrings.find(code);
-	if(csit == _victoryStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetSysString(uint32_t code) const {
+	return GetMapString(_sysStrings, code);
 }
-const wchar_t* DataManager::GetCounterName(int code) const {
-	auto csit = _counterStrings.find(code);
-	if(csit == _counterStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetVictoryString(uint32_t code) const {
+	return GetMapString(_victoryStrings, code);
 }
-const wchar_t* DataManager::GetSetName(int code) const {
-	auto csit = _setnameStrings.find(code);
-	if(csit == _setnameStrings.end())
-		return unknown_string;
-	return csit->second.c_str();
+const wchar_t* DataManager::GetCounterName(uint32_t code) const {
+	return GetMapString(_counterStrings, code);
 }
-std::vector<unsigned int> DataManager::GetSetCodes(std::wstring setname) const {
-	std::vector<unsigned int> matchingCodes;
+const wchar_t* DataManager::GetSetName(uint32_t code) const {
+	return GetMapString(_setnameStrings, code);
+}
+std::vector<uint32_t> DataManager::GetSetCodes(std::wstring setname) const {
+	std::vector<uint32_t> matchingCodes;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
-		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
-		if(setname.size() < 2) {
-			if(csit->second.compare(0, xpos, setname) == 0
-				|| csit->second.compare(xpos + 1, csit->second.length(), setname) == 0)
-				matchingCodes.push_back(csit->first);
-		} else {
-			if(csit->second.substr(0, xpos).find(setname) != std::wstring::npos
-				|| csit->second.substr(xpos + 1).find(setname) != std::wstring::npos) {
-				matchingCodes.push_back(csit->first);
+		const std::wstring& setnameString = csit->second;
+		size_t start = 0;
+		while(start < setnameString.size()) { // handle "setname|another setname"
+			auto pos = setnameString.find(L'|', start);
+			std::wstring token;
+			if(pos == std::wstring::npos)
+				token = setnameString.substr(start);
+			else
+				token = setnameString.substr(start, pos - start);
+			if(setname.size() < 2) {
+				// exact match for short set names to avoid too many results
+				if(token == setname) {
+					matchingCodes.push_back(csit->first);
+					break;
+				}
+			} else {
+				if(token.find(setname) != std::wstring::npos) {
+					matchingCodes.push_back(csit->first);
+					break;
+				}
 			}
+			if(pos == std::wstring::npos)
+				break;
+			start = pos + 1;
 		}
 	}
 	return matchingCodes;
@@ -322,11 +331,10 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 		else
 			return GetSysString(1009);
 	}
-	int i = 1000;
 	int string_id = 0;
-	for (unsigned filter = LOCATION_DECK; filter <= LOCATION_PZONE; filter <<= 1, ++i) {
-		if (filter == location) {
-			string_id = i;
+	for (int i = 0; i < 10; ++i) {
+		if ((0x1U << i) == location) {
+			string_id = STRING_ID_LOCATION + i;
 			break;
 		}
 	}
@@ -335,17 +343,22 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) const {
 	else
 		return unknown_string;
 }
+const wchar_t* DataManager::FormatLocation(ClientCard* card) const {
+	if (!card)
+		return unknown_string;
+	return FormatLocation(card->location, card->sequence);
+}
 std::wstring DataManager::FormatAttribute(unsigned int attribute) const {
 	std::wstring buffer;
 	for (int i = 0; i < ATTRIBUTES_COUNT; ++i) {
 		if (attribute & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(1010 + i));
+			buffer.append(GetSysString(STRING_ID_ATTRIBUTE + i));
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatRace(unsigned int race) const {
@@ -354,25 +367,24 @@ std::wstring DataManager::FormatRace(unsigned int race) const {
 		if(race & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(1020 + i));
+			buffer.append(GetSysString(STRING_ID_RACE + i));
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatType(unsigned int type) const {
 	std::wstring buffer;
-	int i = 1050;
-	for (unsigned filter = TYPE_MONSTER; filter <= TYPE_LINK; filter <<= 1, ++i) {
-		if (type & filter) {
+	for (int i = 0; i < TYPES_COUNT; ++i) {
+		if (type & (0x1U << i)) {
 			if (!buffer.empty())
 				buffer.push_back(L'|');
-			buffer.append(GetSysString(i));
+			buffer.append(GetSysString(STRING_ID_TYPE + i));
 		}
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
@@ -386,7 +398,7 @@ std::wstring DataManager::FormatSetName(const uint16_t setcode[]) const {
 		buffer.append(setname);
 	}
 	if (buffer.empty())
-		return std::wstring(unknown_string);
+		buffer = unknown_string;
 	return buffer;
 }
 std::wstring DataManager::FormatLinkMarker(unsigned int link_marker) const {
@@ -421,10 +433,10 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 		return ReadScriptFromFile(script_path, slen);
 	const char* script_name = script_path + 2;
 	char expansions_path[1024]{};
-	std::snprintf(expansions_path, sizeof expansions_path, "./expansions/%s", script_name);
+	mysnprintf(expansions_path, "./expansions/%s", script_name);
 #ifdef YGOPRO_SERVER_MODE
 	char special_path[1024]{};
-	std::snprintf(special_path, sizeof special_path, "./specials/%s", script_path + 9);
+	mysnprintf(special_path, "./specials/%s", script_path + 9);
 	if (ReadScriptFromFile(special_path, slen))
 		return scriptBuffer;
 	if (ReadScriptFromFile(expansions_path, slen)) // always read expansions first
@@ -456,13 +468,7 @@ unsigned char* DataManager::ScriptReaderEx(const char* script_path, int* slen) {
 }
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 unsigned char* DataManager::ReadScriptFromIrrFS(const char* script_name, int* slen) {
-#ifdef _WIN32
-	wchar_t fname[256]{};
-	BufferIO::DecodeUTF8(script_name, fname);
-	auto reader = FileSystem->createAndOpenFile(fname);
-#else
-	auto reader = FileSystem->createAndOpenFile(script_name);
-#endif
+	auto reader = dataManager.FileSystem->createAndOpenFile(script_name);
 	if (!reader)
 		return nullptr;
 	int size = reader->read(scriptBuffer, sizeof scriptBuffer);

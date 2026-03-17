@@ -5,8 +5,7 @@ rm -rf libs obj
 ndk-build USR_SHARED=true -j3
 cd ../linux
 rm -rf bin obj
-make -j3
-strip bin/Release/AI.Server.linux
+STRIP=strip make -j3
 cd ../macosx
 rm -rf bin obj
 OSX make -j3

@@ -675,15 +675,15 @@ uint32_t field::process() {
 			++it->step;
 		} else {
 			if(returns.bvalue[0] != 0xff) {
-				card* tc[16];
+				card* tc[256];
 				for(i = 0; i < count; ++i)
 					player[target_player].list_main.pop_back();
 				for(i = 0; i < count; ++i)
 					tc[returns.bvalue[i]] = core.select_cards[i];
 				for(i = 0; i < count; ++i) {
-					player[target_player].list_main.push_back(tc[count - i - 1]);
-					tc[count - i - 1]->current.sequence = (uint8_t)player[target_player].list_main.size() - 1;
+					player[target_player].list_main.push_back(tc[count - 1 - i]);
 				}
+				reset_sequence(target_player, LOCATION_DECK);
 				auto clit = player[target_player].list_main.rbegin();
 				for(i = 0; i < count; ++i, ++clit) {
 					card* pcard = *clit;
@@ -3919,6 +3919,9 @@ int32_t field::process_turn(uint16_t step, uint8_t turn_player) {
 			}
 			return FALSE;
 		}
+		// ensure "entered 2nd Battle Phase" marker stored in `arg2` do not carry over into Main Phase 2.
+		core.units.begin()->arg2 = 0;
+		
 		core.skip_m2 = FALSE;
 		if(returns.ivalue[0] == 3) { // End Phase
 			core.skip_m2 = TRUE;
@@ -4148,6 +4151,7 @@ int32_t field::add_chain(uint16_t step) {
 		clit.triggering_effect = peffect;
 		clit.evt = ch.evt;
 		phandler->create_relation(clit);
+		peffect->set_active_type();
 		peffect->dec_count(playerid);
 		if(!(peffect->type & EFFECT_TYPE_ACTIVATE)) {
 			peffect->type |= EFFECT_TYPE_ACTIVATE;

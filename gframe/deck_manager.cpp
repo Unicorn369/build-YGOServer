@@ -5,9 +5,6 @@
 
 namespace ygo {
 
-#ifndef YGOPRO_SERVER_MODE
-char DeckManager::deckBuffer[0x10000]{};
-#endif
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
@@ -15,7 +12,6 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	FILE* fp = myfopen(path, "r");
 	char linebuf[256]{};
 	wchar_t strBuffer[256]{};
-	char str1[16]{};
 	if(fp) {
 		while(std::fgets(linebuf, sizeof linebuf, fp)) {
 			if(linebuf[0] == '#')
@@ -33,13 +29,20 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			}
 			if (cur == _lfList.rend())
 				continue;
-			unsigned int code = 0;
-			int count = -1;
-			if (std::sscanf(linebuf, "%10s%*[ ]%1d", str1, &count) != 2)
+			char* pos = linebuf;
+			errno = 0;
+			auto result = std::strtoul(pos, &pos, 10);
+			if (errno || result > UINT32_MAX)
+				continue;
+			if (pos == linebuf || *pos != ' ')
+				continue;
+			uint32_t code = static_cast<uint32_t>(result);
+			errno = 0;
+			int count = std::strtol(pos, &pos, 10);
+			if (errno)
 				continue;
 			if (count < 0 || count > 2)
 				continue;
-			code = std::strtoul(str1, nullptr, 10);
 			cur->content[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
@@ -105,7 +108,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 			return (gameruleDeckError << 28) | cit->first;
 		if (cit->second.type & (TYPES_EXTRA_DECK | TYPE_TOKEN))
 			return (DECKERROR_MAINCOUNT << 28);
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		auto code = cit->second.get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
@@ -120,7 +123,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 			return (gameruleDeckError << 28) | cit->first;
 		if (!(cit->second.type & TYPES_EXTRA_DECK) || cit->second.type & TYPE_TOKEN)
 			return (DECKERROR_EXTRACOUNT << 28);
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		auto code = cit->second.get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
@@ -135,7 +138,7 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 			return (gameruleDeckError << 28) | cit->first;
 		if (cit->second.type & TYPE_TOKEN)
 			return (DECKERROR_SIDECOUNT << 28);
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		auto code = cit->second.get_duel_code();
 		ccount[code]++;
 		int dc = ccount[code];
 		if(dc > 3)
@@ -149,42 +152,46 @@ unsigned int DeckManager::CheckDeck(const Deck& deck, unsigned int lfhash, int r
 uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t dbuf[], int mainc, int sidec, bool is_packlist) {
 	deck.clear();
 	uint32_t errorcode = 0;
-	CardData cd;
+	auto& _datas = dataManager.GetDataTable();
 	for(int i = 0; i < mainc; ++i) {
 		auto code = dbuf[i];
-		if(!dataManager.GetData(code, &cd)) {
+		auto it = _datas.find(code);
+		if(it == _datas.end()) {
 			errorcode = code;
 			continue;
 		}
+		auto& cd = it->second;
 		if (cd.type & TYPE_TOKEN) {
 			errorcode = code;
 			continue;
 		}
 		if(is_packlist) {
-			deck.main.push_back(dataManager.GetCodePointer(code));
+			deck.main.push_back(it);
 			continue;
 		}
 		if (cd.type & TYPES_EXTRA_DECK) {
 			if (deck.extra.size() < EXTRA_MAX_SIZE)
-				deck.extra.push_back(dataManager.GetCodePointer(code));
+				deck.extra.push_back(it);
 		}
 		else {
 			if (deck.main.size() < DECK_MAX_SIZE)
-				deck.main.push_back(dataManager.GetCodePointer(code));
+				deck.main.push_back(it);
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
 		auto code = dbuf[mainc + i];
-		if(!dataManager.GetData(code, &cd)) {
+		auto it = _datas.find(code);
+		if(it == _datas.end()) {
 			errorcode = code;
 			continue;
 		}
+		auto& cd = it->second;
 		if (cd.type & TYPE_TOKEN) {
 			errorcode = code;
 			continue;
 		}
 		if(deck.side.size() < SIDE_MAX_SIZE)
-			deck.side.push_back(dataManager.GetCodePointer(code));
+			deck.side.push_back(it);
 	}
 	return errorcode;
 }
@@ -201,8 +208,9 @@ uint32_t DeckManager::LoadDeckFromStream(Deck& deck, std::istringstream& deckStr
 		}
 		if (linebuf[0] < '0' || linebuf[0] > '9')
 			continue;
+		errno = 0;
 		auto code = std::strtoul(linebuf.c_str(), nullptr, 10);
-		if (code >= UINT32_MAX)
+		if (errno || code > UINT32_MAX)
 			continue;
 		cardlist[ct++] = code;
 		if (is_side)
@@ -245,15 +253,15 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t dbuf[], int mainc, int sidec) {
 void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
 	wchar_t catepath[256];
 	switch(index) {
-	case 0:
+	case DECK_CATEGORY_PACK:
 		myswprintf(catepath, L"./pack");
 		break;
-	case 1:
+	case DECK_CATEGORY_BOT:
 		BufferIO::CopyWideString(mainGame->gameConf.bot_deck_path, catepath);
 		break;
 	case -1:
-	case 2:
-	case 3:
+	case DECK_CATEGORY_NONE:
+	case DECK_CATEGORY_SEPARATOR:
 		myswprintf(catepath, L"./deck");
 		break;
 	default:
@@ -278,13 +286,9 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 	return fp;
 }
 irr::io::IReadFile* DeckManager::OpenDeckReader(const wchar_t* file) {
-#ifdef _WIN32
-	auto reader = DataManager::FileSystem->createAndOpenFile(file);
-#else
 	char file2[256];
 	BufferIO::EncodeUTF8(file, file2);
-	auto reader = DataManager::FileSystem->createAndOpenFile(file2);
-#endif
+	auto reader = dataManager.FileSystem->createAndOpenFile(file2);
 	return reader;
 }
 bool DeckManager::LoadCurrentDeck(std::istringstream& deckStream, bool is_packlist) {
@@ -293,6 +297,9 @@ bool DeckManager::LoadCurrentDeck(std::istringstream& deckStream, bool is_packli
 }
 bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	current_deck.clear();
+	if (!file[0])
+		return false;
+	char deckBuffer[MAX_YDK_SIZE]{};
 	auto reader = OpenDeckReader(file);
 	if(!reader) {
 		wchar_t localfile[256];
@@ -306,7 +313,6 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 	}
 	if(!reader)
 		return false;
-	std::memset(deckBuffer, 0, sizeof deckBuffer);
 	int size = reader->read(deckBuffer, sizeof deckBuffer);
 	reader->drop();
 	if (size >= (int)sizeof deckBuffer) {
@@ -319,11 +325,12 @@ bool DeckManager::LoadCurrentDeck(const wchar_t* file, bool is_packlist) {
 bool DeckManager::LoadCurrentDeck(int category_index, const wchar_t* category_name, const wchar_t* deckname) {
 	wchar_t filepath[256];
 	GetDeckFile(filepath, category_index, category_name, deckname);
-	bool is_packlist = (category_index == 0);
-	bool res = LoadCurrentDeck(filepath, is_packlist);
-	if (res && mainGame->is_building)
+	bool is_packlist = (category_index == DECK_CATEGORY_PACK);
+	if(!LoadCurrentDeck(filepath, is_packlist))
+		return false;
+	if (mainGame->is_building)
 		mainGame->deckBuilder.RefreshPackListScroll();
-	return res;
+	return true;
 }
 void DeckManager::SaveDeck(const Deck& deck, std::stringstream& deckStream) {
 	deckStream << "#created by ..." << std::endl;
@@ -345,7 +352,7 @@ bool DeckManager::SaveDeck(const Deck& deck, const wchar_t* file) {
 		return false;
 	std::stringstream deckStream;
 	SaveDeck(deck, deckStream);
-	std::fwrite(deckStream.str().c_str(), 1, deckStream.str().length(), fp);
+	std::fputs(deckStream.str().c_str(), fp);
 	std::fclose(fp);
 	return true;
 }
