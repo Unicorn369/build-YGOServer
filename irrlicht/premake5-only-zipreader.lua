@@ -31,8 +31,10 @@ project "irrlicht"
         "source/Irrlicht/CZipReader.cpp"
     }
 
+    filter { "net system:windows" }
+        defines { "NO_IRR_USE_NON_SYSTEM_ZLIB_" }
+
     filter { "system:windows" }
-        defines { "_IRR_WCHAR_FILESYSTEM", "NO_IRR_USE_NON_SYSTEM_ZLIB_" }
         includedirs { "source/Irrlicht/zlib" }
         files {
             "source/Irrlicht/zlib/adler32.c",

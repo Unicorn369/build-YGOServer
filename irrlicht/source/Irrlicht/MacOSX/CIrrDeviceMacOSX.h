@@ -209,6 +209,13 @@ namespace irr
 				CursorPos.Y = y;
 			}
 
+			void updateWindowSize(const core::dimension2d<u32>& size)
+			{
+				WindowSize = core::dimension2d<s32>(size.Width, size.Height);
+				InvWindowSize.Width = WindowSize.Width ? 1.0f / WindowSize.Width : 0.0f;
+				InvWindowSize.Height = WindowSize.Height ? 1.0f / WindowSize.Height : 0.0f;
+			}
+
 		private:
 
 			core::position2d<s32> CursorPos;

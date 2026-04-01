@@ -482,7 +482,6 @@ CIrrDeviceMacOSX::CIrrDeviceMacOSX(const SIrrlichtCreationParameters& param)
 	IsActive(true), IsFullscreen(false), IsShiftDown(false), IsControlDown(false), IsResizable(false)
 {
 	struct utsname name;
-	NSString *path;
 
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceMacOSX");
@@ -495,17 +494,20 @@ CIrrDeviceMacOSX::CIrrDeviceMacOSX(const SIrrlichtCreationParameters& param)
 		if(!CreationParams.WindowId) //load menus if standalone application
 		{
 			[[NSAutoreleasePool alloc] init];
+			[[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
 			[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 			[NSApp setDelegate:(id<NSApplicationDelegate>)[[[AppDelegate alloc] initWithDevice:this] autorelease]];
 			[NSBundle loadNibNamed:@"MainMenu" owner:[NSApp delegate]];
 			[NSApp finishLaunching];
 		}
 
-		path = [[[NSBundle mainBundle] bundlePath] stringByDeletingLastPathComponent];
-		chdir([path fileSystemRepresentation]);
-		[path release];
+		NSString* bundlePath = [[NSBundle mainBundle] bundlePath];
+		if ([[bundlePath lowercaseString] hasSuffix:@".app"]) {
+			NSString* path = [bundlePath stringByDeletingLastPathComponent];
+			chdir([path fileSystemRepresentation]);
+		}
 	}
-    NSWindow* a;
+
 	uname(&name);
 	Operator = new COSOperator(name.version);
 	os::Printer::log(name.version,ELL_INFORMATION);
@@ -667,7 +669,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						NSOpenGLPFASamples, (NSOpenGLPixelFormatAttribute)CreationParams.AntiAlias,
 						NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
 						NSOpenGLPFADoubleBuffer,
-						(NSOpenGLPixelFormatAttribute)nil
+						(NSOpenGLPixelFormatAttribute)0
 					};
 
 					if (CreationParams.AntiAlias<2)
@@ -693,7 +695,7 @@ bool CIrrDeviceMacOSX::createWindow()
 						{
 							// Third try without Doublebuffer
 							os::Printer::log("No doublebuffering available.", ELL_WARNING);
-							windowattribs[14]=(NSOpenGLPixelFormatAttribute)nil;
+							windowattribs[14]=(NSOpenGLPixelFormatAttribute)0;
 						}
 
 						format = [[NSOpenGLPixelFormat alloc] initWithAttributes:windowattribs];
@@ -921,22 +923,34 @@ bool CIrrDeviceMacOSX::createWindow()
 
 void CIrrDeviceMacOSX::setResize(int width, int height)
 {
-	// set new window size
-	DeviceWidth = width;
-	DeviceHeight = height;
+	core::dimension2d<u32> drawableSize;
+
+	// Use the content rect size for both rendering and mouse coordinates.
+	// AppDelegate passes the outer frame size here, which would otherwise
+	// skew all mouse hit-testing after a resize.
+	if (Window)
+	{
+		NSRect driverFrame = [Window contentRectForFrameRect:[Window frame]];
+		DeviceWidth = (int)driverFrame.size.width;
+		DeviceHeight = (int)driverFrame.size.height;
+		drawableSize = core::dimension2d<u32>((u32)DeviceWidth, (u32)DeviceHeight);
+	}
+	else
+	{
+		DeviceWidth = width;
+		DeviceHeight = height;
+		drawableSize = core::dimension2d<u32>((u32)width, (u32)height);
+	}
+
+	if (CursorControl)
+		((CCursorControl*)CursorControl)->updateWindowSize(drawableSize);
 
 	// update the size of the opengl rendering context
 	if(OGLContext);
 		[OGLContext update];
 
 	// resize the driver to the inner pane size
-	if (Window)
-	{
-		NSRect driverFrame = [Window contentRectForFrameRect:[Window frame]];
-		getVideoDriver()->OnResize(core::dimension2d<u32>( (s32)driverFrame.size.width, (s32)driverFrame.size.height));
-	}
-	else
-		getVideoDriver()->OnResize(core::dimension2d<u32>( (s32)width, (s32)height));
+	getVideoDriver()->OnResize(drawableSize);
 
 	if (CreationParams.WindowId && OGLContext)
 		[(NSOpenGLContext *)OGLContext update];
@@ -1024,13 +1038,13 @@ bool CIrrDeviceMacOSX::run()
 		auto frameHeight = [[textView superview] frame].size.height;
 		NSRect rect = {
 			(frameHeight - crect.LowerRightCorner.Y > crect.getHeight()) ?
-				crect.UpperLeftCorner.X :
-				crect.UpperLeftCorner.X + crect.getWidth() / 2,
+				(CGFloat)crect.UpperLeftCorner.X :
+				(CGFloat)(crect.UpperLeftCorner.X + crect.getWidth() / 2),
 			(frameHeight - crect.LowerRightCorner.Y > crect.getHeight()) ?
-				frameHeight - crect.LowerRightCorner.Y - crect.getHeight() - 1 :
-				frameHeight - crect.LowerRightCorner.Y,
-			crect.getWidth() / 2,
-			crect.getHeight(),
+				(CGFloat)(frameHeight - crect.LowerRightCorner.Y - crect.getHeight() - 1) :
+				(CGFloat)(frameHeight - crect.LowerRightCorner.Y),
+			(CGFloat)(crect.getWidth() / 2),
+			(CGFloat)crect.getHeight(),
 		};
 		[textView setFrame:rect];
 		[textView setHidden:NO];
@@ -1093,7 +1107,18 @@ bool CIrrDeviceMacOSX::run()
 
 			case NSLeftMouseDown:
 				ievent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-				ievent.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
+				switch ([(NSEvent *)event clickCount])
+				{
+					case 2:
+						ievent.MouseInput.Event = irr::EMIE_LMOUSE_DOUBLE_CLICK;
+						break;
+					case 3:
+						ievent.MouseInput.Event = irr::EMIE_LMOUSE_TRIPLE_CLICK;
+						break;
+					default:
+						ievent.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
+						break;
+				}
 				MouseButtonStates |= irr::EMBSM_LEFT;
 				ievent.MouseInput.ButtonStates = MouseButtonStates;
 				postMouseEvent(event,ievent);

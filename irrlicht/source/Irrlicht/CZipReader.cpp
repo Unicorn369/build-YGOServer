@@ -521,7 +521,6 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 	//99 - AES encryption, WinZip 9
 
 	const SZipFileEntry &e = FileInfo[Files[index].ID];
-	wchar_t buf[64];
 	s16 actualCompressionMethod=e.header.CompressionMethod;
 	IReadFile* decrypted=0;
 	u8* decryptedBuf=0;
@@ -620,8 +619,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 			c8* pBuf = new c8[ uncompressedSize ];
 			if (!pBuf)
 			{
-				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
+				os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 				if (decrypted)
 					decrypted->drop();
 				return 0;
@@ -633,8 +631,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 				pcData = new u8[decryptedSize];
 				if (!pcData)
 				{
-					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-					os::Printer::log( buf, ELL_ERROR);
+					os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 					delete [] pBuf;
 					return 0;
 				}
@@ -663,8 +660,6 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 				inflateEnd(&stream);
 				if (err == Z_STREAM_END)
 					err = Z_OK;
-				err = Z_OK;
-				inflateEnd(&stream);
 			}
 
 			if (decrypted)
@@ -674,8 +669,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 
 			if (err != Z_OK)
 			{
-				swprintf ( buf, 64, L"Error decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
+				os::Printer::log("Error decompressing", Files[index].FullName, ELL_ERROR);
 				delete [] pBuf;
 				return 0;
 			}
@@ -694,8 +688,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 			c8* pBuf = new c8[ uncompressedSize ];
 			if (!pBuf)
 			{
-				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
+				os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 				if (decrypted)
 					decrypted->drop();
 				return 0;
@@ -707,8 +700,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 				pcData = new u8[decryptedSize];
 				if (!pcData)
 				{
-					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-					os::Printer::log( buf, ELL_ERROR);
+					os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 					delete [] pBuf;
 					return 0;
 				}
@@ -745,8 +737,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 
 			if (err != BZ_OK)
 			{
-				swprintf ( buf, 64, L"Error decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
+				os::Printer::log("Error decompressing", Files[index].FullName, ELL_ERROR);
 				delete [] pBuf;
 				return 0;
 			}
@@ -766,8 +757,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 			c8* pBuf = new c8[ uncompressedSize ];
 			if (!pBuf)
 			{
-				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-				os::Printer::log( buf, ELL_ERROR);
+				os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 				if (decrypted)
 					decrypted->drop();
 				return 0;
@@ -779,8 +769,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 				pcData = new u8[decryptedSize];
 				if (!pcData)
 				{
-					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
-					os::Printer::log( buf, ELL_ERROR);
+					os::Printer::log("Not enough memory for decompressing", Files[index].FullName, ELL_ERROR);
 					delete [] pBuf;
 					return 0;
 				}
@@ -826,8 +815,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 		os::Printer::log("Decryption support not enabled. File cannot be read.", ELL_ERROR);
 		return 0;
 	default:
-		swprintf ( buf, 64, L"file has unsupported compression method. %s", Files[index].FullName.c_str() );
-		os::Printer::log( buf, ELL_ERROR);
+		os::Printer::log("file has unsupported compression method.", Files[index].FullName, ELL_ERROR);
 		return 0;
 	};
 

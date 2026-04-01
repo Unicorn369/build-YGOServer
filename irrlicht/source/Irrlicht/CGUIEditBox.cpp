@@ -287,9 +287,10 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
-				core::stringw s;
-				s = Text.subString(realmbgn, realmend - realmbgn).c_str();
-				Operator->copyToClipboard(s.c_str());
+				core::stringw s = Text.subString(realmbgn, realmend - realmbgn);
+				c8* mb = core::toMultiByte(s.c_str());
+				Operator->copyToClipboard(mb);
+				delete[] mb;
 			}
 			break;
 		case KEY_KEY_X:
@@ -300,9 +301,10 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// copy
-				core::stringw sc;
-				sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
-				Operator->copyToClipboard(sc.c_str());
+				core::stringw sc = Text.subString(realmbgn, realmend - realmbgn);
+				c8* mb = core::toMultiByte(sc.c_str());
+				Operator->copyToClipboard(mb);
+				delete[] mb;
 
 				if (isEnabled())
 				{
@@ -330,10 +332,12 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// add new character
-				const c16* p = Operator->getTextFromClipboard();
+				const c8* p = Operator->getTextFromClipboard();
 				if (p)
 				{
-					irr::core::stringw widep(p);
+					wchar_t* ws = core::toWideChar(p);
+					irr::core::stringw widep(ws);
+					delete[] ws;
 
 					if (MarkBegin == MarkEnd)
 					{
@@ -1337,10 +1341,10 @@ void CGUIEditBox::inputChar(wchar_t c)
 			BlinkStartTime = os::Timer::getTime();
 			setTextMarkers(0, 0);
 		}
+		breakText();
+		calculateScrollPos();
+		sendGuiEvent(EGET_EDITBOX_CHANGED);
 	}
-	breakText();
-	calculateScrollPos();
-	sendGuiEvent(EGET_EDITBOX_CHANGED);
 }
 
 // calculate autoscroll

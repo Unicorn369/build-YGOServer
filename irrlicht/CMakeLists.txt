@@ -36,7 +36,3 @@ add_definitions(
     -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
     -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
 )
-
-if(WIN32)
-    add_definitions(-D_IRR_WCHAR_FILESYSTEM)
-endif()

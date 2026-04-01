@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #OSX=: AR=x86_64-apple-darwin20.4-ar CC=x86_64-apple-darwin20.4-clang CXX=x86_64-apple-darwin20.4-clang++
+#WIN=: AR=i686-w64-mingw32-ar CC=i686-w64-mingw32-clang CXX=i686-w64-mingw32-clang++ STRIP=i686-w64-mingw32-strip RESCOMP=i686-w64-mingw32-windres
 cd android
 rm -rf libs obj
 ndk-build USR_SHARED=true -j3
@@ -9,3 +10,6 @@ STRIP=strip make -j3
 cd ../macosx
 rm -rf bin obj
 OSX make -j3
+cd ../windows.mingw
+rm -rf bin obj
+WIN make -j3
