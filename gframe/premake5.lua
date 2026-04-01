@@ -78,7 +78,6 @@ end
     end
 
     filter "system:windows"
-        defines { "_IRR_WCHAR_FILESYSTEM" }
         files "ygopro.rc"
 if not SERVER_MODE then
         libdirs { "$(DXSDK_DIR)Lib/x86" }

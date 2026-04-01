@@ -28,7 +28,6 @@ add_definitions(-DYGOPRO_SERVER_MODE)
 target_link_libraries (ygopro clzma spmemvfs ocgcore event sqlite3)
 
 if(WIN32)
-    add_definitions(-D_IRR_WCHAR_FILESYSTEM)
     target_sources(ygopro PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ygopro.rc)
     target_link_libraries (ygopro ws2_32)
 elseif(ANDROID)
