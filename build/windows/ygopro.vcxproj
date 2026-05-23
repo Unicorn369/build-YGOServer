@@ -114,7 +114,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4244;4267;4838;4996;6011;6031;6054;6262;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -127,7 +127,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
@@ -144,7 +144,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4244;4267;4838;4996;6011;6031;6054;6262;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -156,7 +156,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
@@ -173,7 +173,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>6011;6031;6054;6262;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -182,7 +182,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
@@ -197,7 +197,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>6011;6031;6054;6262;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -205,7 +205,7 @@
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;_IRR_WCHAR_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINVER=0x0501;_DEBUG;_CRT_SECURE_NO_WARNINGS;YGOPRO_SERVER_MODE;SERVER_ZIP_SUPPORT;SERVER_PRO2_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ocgcore;..\..\irrlicht\source\Irrlicht;..\..\libevent\include;..\..\libevent\Win32;..\..\irrlicht\include;..\..\freetype\include;..\..\sqlite3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
