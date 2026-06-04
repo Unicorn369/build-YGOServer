@@ -29,10 +29,10 @@ ifeq ($(origin AR), default)
 endif
 RESCOMP = windres
 TARGETDIR = bin
-TARGET = $(TARGETDIR)/libcspmemvfs.a
-OBJDIR = obj/Release/cspmemvfs
-DEFINES += -DNDEBUG -D_POSIX_C_SOURCE=200809L
-INCLUDES += -I../../sqlite3
+TARGET = $(TARGETDIR)/libsqlite3.a
+OBJDIR = obj/Release/sqlite3
+DEFINES += -DNDEBUG -DSQLITE_DQS=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_MAX_EXPR_DEPTH=0 -DSQLITE_OMIT_DECLTYPE -DSQLITE_OMIT_DEPRECATED -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_SHARED_CACHE -DSQLITE_TRUSTED_SCHEMA=0
+INCLUDES +=
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -std=c11 -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
@@ -59,8 +59,8 @@ endef
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/spmemvfs.o
-OBJECTS += $(OBJDIR)/spmemvfs.o
+GENERATED += $(OBJDIR)/sqlite3.o
+OBJECTS += $(OBJDIR)/sqlite3.o
 
 # Rules
 # #############################################
@@ -70,7 +70,7 @@ all: $(TARGET)
 
 $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking cspmemvfs
+	@echo Linking sqlite3
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -91,7 +91,7 @@ else
 endif
 
 clean:
-	@echo Cleaning cspmemvfs
+	@echo Cleaning sqlite3
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)
@@ -124,7 +124,7 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/spmemvfs.o: ../../gframe/spmemvfs/spmemvfs.c
+$(OBJDIR)/sqlite3.o: ../../sqlite3/sqlite3.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

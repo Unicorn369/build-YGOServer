@@ -32,15 +32,15 @@ TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.osx
 OBJDIR = obj/Release/ygopro
 DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/macosx -I../../irrlicht/include
+INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/macosx -I../../irrlicht/include -I../../sqlite3
 FORCE_INCLUDE +=
 OSX_CFLAGS += -arch x86_64 -arch arm64
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) $(OSX_CFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) $(OSX_CFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -lsqlite3 -lz -ldl -lpthread
-LDDEPS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
+LIBS += bin/libocgcore.a bin/libclzma.a bin/libsqlite3.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -lz -ldl -lpthread
+LDDEPS += bin/libocgcore.a bin/libclzma.a bin/libsqlite3.a bin/liblua.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
 ALL_LDFLAGS += $(LDFLAGS) $(OSX_CFLAGS)
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS

@@ -41,9 +41,9 @@ ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -lz -ldl -lpthread
+LIBS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -ldl -lpthread
 LDDEPS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
-ALL_LDFLAGS += $(LDFLAGS)
+ALL_LDFLAGS += $(LDFLAGS) -static
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
