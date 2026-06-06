@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/libocgcore.a
-OBJDIR = obj/Release/ocgcore
+OBJDIR = obj/ocgcore
 DEFINES += -DNDEBUG -DLUA_USE_LINUX
 INCLUDES += -I../../lua/src
 FORCE_INCLUDE +=

@@ -26,35 +26,6 @@ x86_64
 ## 如何编译
 编译请参考`build/build.bat`或`build/build.sh`
 
-对于某些`Linux平台`需改用`libevent/linux/event2/event-config-debian12.h`否则程序无法正常运行
+编译Linux平台推荐使用 [musl编译器](https://github.com/Unicorn369/build-YGOServer/releases/tag/v0.0.0) 防止在其他Linux上因glib版本问题不能运行
 
 在Linux平台上，交叉编译`macOS`与`windows`请使用此工具 --> [tools](https://github.com/Unicorn369/build-YGOServer/releases/tag/v0.0.0)
-
-### 使用CMAKE编译
-通用(Linux/macOS/Windows)
-```
-mkdir -p build-cmake && cd build-cmake
-cmake ..
-cmake --build . --config Release
-```
-
-使用NDK编译(Android)
-```
-mkdir -p build-cmake && cd build-cmake
-cmake .. -DCMAKE_TOOLCHAIN_FILE=${NDK_HOME}/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_NATIVE_API_LEVEL=21 -DANDROID_TOOLCHAIN=clang
-cmake --build . --config Release
-```
-
-构造64位(Windows)
-```
-mkdir -p build-cmake && cd build-cmake
-cmake .. -A"x64"
-cmake --build . --config Release
-```
-
-使用[MinGW](https://github.com/Unicorn369/build-YGOServer/releases/download/v0.0.0/win64-llvm-mingw.zip)编译(Windows)
-```
-mkdir -p build-cmake && cd build-cmake
-cmake .. -G"MinGW Makefiles"
-cmake --build . --config Release
-```

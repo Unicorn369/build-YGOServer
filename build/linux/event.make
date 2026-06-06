@@ -27,10 +27,17 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
+
+IS_MUSL := $(shell $(CC) -dumpmachine | grep -q 'musl' && echo yes || echo no)
+ifeq ($(IS_MUSL), yes)
+  DEFINES += -DMUSL_BUILD
+  #LDFLAGS += -static
+endif
+
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/libevent.a
-OBJDIR = obj/Release/event
+OBJDIR = obj/event
 DEFINES += -DNDEBUG
 INCLUDES += -I../../libevent/include -I../../libevent/compat -I../../libevent/linux
 FORCE_INCLUDE +=

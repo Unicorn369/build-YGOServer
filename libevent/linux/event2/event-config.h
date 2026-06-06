@@ -43,7 +43,9 @@
 
 /* Define to 1 if you have the declaration of `CTL_KERN', and to 0 if you
    don't. */
-/* #undef EVENT__HAVE_DECL_CTL_KERN */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_DECL_CTL_KERN 1
+#endif
 
 /* Define to 1 if you have the declaration of `KERN_ARND', and to 0 if you
    don't. */
@@ -51,11 +53,15 @@
 
 /* Define to 1 if you have the declaration of `KERN_RANDOM', and to 0 if you
    don't. */
-/* #undef EVENT__HAVE_DECL_KERN_RANDOM */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_DECL_KERN_RANDOM 1
+#endif
 
 /* Define to 1 if you have the declaration of `RANDOM_UUID', and to 0 if you
    don't. */
-/* #undef EVENT__HAVE_DECL_RANDOM_UUID */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_DECL_RANDOM_UUID 1
+#endif
 
 /* Define if /dev/poll is available */
 /* #undef EVENT__HAVE_DEVPOLL */
@@ -139,13 +145,15 @@
 #define EVENT__HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `issetugid' function. */
+#ifdef MUSL_BUILD
 #define EVENT__HAVE_ISSETUGID 1
+#endif
 
 /* Define to 1 if you have the `kqueue' function. */
 /* #undef EVENT__HAVE_KQUEUE */
 
 /* Define if the system has zlib */
-/* #undef EVENT__HAVE_LIBZ */
+#define EVENT__HAVE_LIBZ 1
 
 /* Define to 1 if you have the `mach_absolute_time' function. */
 /* #undef EVENT__HAVE_MACH_ABSOLUTE_TIME */
@@ -253,7 +261,9 @@
 #define EVENT__HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strlcpy' function. */
+#ifdef MUSL_BUILD
 #define EVENT__HAVE_STRLCPY 1
+#endif
 
 /* Define to 1 if you have the `strsep' function. */
 #define EVENT__HAVE_STRSEP 1
@@ -301,7 +311,9 @@
 #define EVENT__HAVE_STRUCT_SOCKADDR_UN 1
 
 /* Define to 1 if you have the `sysctl' function. */
-/* #undef EVENT__HAVE_SYSCTL */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_SYSCTL 1
+#endif
 
 /* Define to 1 if you have the <sys/devpoll.h> header file. */
 /* #undef EVENT__HAVE_SYS_DEVPOLL_H */
@@ -325,7 +337,9 @@
 #define EVENT__HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/queue.h> header file. */
-/* #undef EVENT__HAVE_SYS_QUEUE_H */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_SYS_QUEUE_H 1
+#endif
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #define EVENT__HAVE_SYS_RESOURCE_H 1
@@ -343,7 +357,9 @@
 #define EVENT__HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/sysctl.h> header file. */
-/* #undef EVENT__HAVE_SYS_SYSCTL_H */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_SYS_SYSCTL_H 1
+#endif
 
 /* Define to 1 if you have the <sys/timerfd.h> header file. */
 #define EVENT__HAVE_SYS_TIMERFD_H 1
@@ -364,7 +380,9 @@
 #define EVENT__HAVE_SYS_WAIT_H 1
 
 /* Define if TAILQ_FOREACH is defined in <sys/queue.h> */
-/* #undef EVENT__HAVE_TAILQFOREACH */
+#ifndef MUSL_BUILD
+#define EVENT__HAVE_TAILQFOREACH 1
+#endif
 
 /* Define if timeradd is defined in <sys/time.h> */
 #define EVENT__HAVE_TIMERADD 1
@@ -415,7 +433,7 @@
 /* #undef EVENT__HAVE_WORKING_KQUEUE */
 
 /* Define to 1 if you have the <zlib.h> header file. */
-/* #undef EVENT__HAVE_ZLIB_H */
+#define EVENT__HAVE_ZLIB_H 1
 
 /* Define to 1 if compiler have __FUNCTION__ */
 #define EVENT__HAVE___FUNCTION__ 1

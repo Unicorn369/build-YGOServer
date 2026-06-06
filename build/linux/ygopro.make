@@ -27,9 +27,15 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
-ifeq ($(origin STRIP), default)
+ifndef $(origin STRIP)
   STRIP = strip
 endif
+IS_MUSL := $(shell $(CC) -dumpmachine | grep -q 'musl' && echo yes || echo no)
+ifeq ($(IS_MUSL), yes)
+  DEFINES += -DMUSL_BUILD
+  LDFLAGS += -static
+endif
+
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.linux
@@ -43,7 +49,7 @@ ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
 LIBS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -ldl -lpthread
 LDDEPS += bin/libocgcore.a bin/libclzma.a bin/liblua.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
-ALL_LDFLAGS += $(LDFLAGS) -static
+ALL_LDFLAGS += $(LDFLAGS)
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
