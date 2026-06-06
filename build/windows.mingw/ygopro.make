@@ -27,15 +27,15 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
-ifeq ($(origin STRIP), default)
+ifndef $(origin STRIP)
   STRIP = strip
 endif
-ifeq ($(origin RESCOMP), default)
+ifndef $(origin RESCOMP)
   RESCOMP = windres
 endif
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.exe
-OBJDIR = obj/Release/ygopro
+OBJDIR = obj/ygopro
 DEFINES += -DWINVER=0x0601 -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
 INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/Win32 -I../../irrlicht/include -I../../sqlite3
 FORCE_INCLUDE +=

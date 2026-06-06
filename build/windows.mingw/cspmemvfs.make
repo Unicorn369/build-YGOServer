@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/cspmemvfs.lib
-OBJDIR = obj/Release/cspmemvfs
+OBJDIR = obj/cspmemvfs
 DEFINES += -DWINVER=0x0601 -DNDEBUG -D_POSIX_C_SOURCE=200809L
 INCLUDES += -I../../sqlite3
 FORCE_INCLUDE +=

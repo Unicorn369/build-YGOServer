@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/lua.lib
-OBJDIR = obj/Release/lua
+OBJDIR = obj/lua
 DEFINES += -DWINVER=0x0601 -DNDEBUG
 INCLUDES +=
 FORCE_INCLUDE +=

@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/ocgcore.lib
-OBJDIR = obj/Release/ocgcore
+OBJDIR = obj/ocgcore
 DEFINES += -DWINVER=0x0601 -DNDEBUG
 INCLUDES += -I../../lua/src
 FORCE_INCLUDE +=

@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/event.lib
-OBJDIR = obj/Release/event
+OBJDIR = obj/event
 DEFINES += -DWINVER=0x0601 -DNDEBUG
 INCLUDES += -I../../libevent/include -I../../libevent/compat -I../../libevent/Win32
 FORCE_INCLUDE +=
