@@ -22,7 +22,7 @@
     #define ACCESS access
     #ifdef __APPLE__
         #include <mach-o/dyld.h>
-        #define LIB_FILE_NAME "libocgcore.dylib"
+        #define LIB_FILE_NAME "ocgcore.bundle"
     #else
         #define LIB_FILE_NAME "libocgcore.so"
     #endif
@@ -118,11 +118,16 @@ EXTERN_C void init_dynamic_ocgcore() {
     std::string exe_dir = get_executable_dir();
 
     std::string candidate_paths[] = {
-        // 1. 优先检查当前工作目录 (CWD)
-        "./update/" + std::string(LIB_FILE_NAME),
-        "./" + std::string(LIB_FILE_NAME),
-        // 2. 检查程序所在目录 (可执行文件路径)
-        exe_dir + "/update/" + LIB_FILE_NAME,
+        // 检查当前工作目录 
+        "./updates/" + std::string(LIB_FILE_NAME),
+#ifdef _WIN32
+        "./YGOPro2_Data/Plugins/" + std::string(LIB_FILE_NAME),
+#elif __APPLE__
+        "./YGOPro2.app/Contents/Plugins/" + std::string(LIB_FILE_NAME),
+#elif __LINUX__
+        "./YGOPro2_Data/Plugins/x86_64/" + std::string(LIB_FILE_NAME),
+#endif
+        // 检查可执行文件所在目录
         exe_dir + "/" + LIB_FILE_NAME
     };
 
