@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.osx
-OBJDIR = obj/Release/ygopro
+OBJDIR = obj/ygopro
 DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
 INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/macosx -I../../irrlicht/include -I../../sqlite3
 FORCE_INCLUDE +=

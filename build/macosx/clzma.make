@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/libclzma.a
-OBJDIR = obj/Release/clzma
+OBJDIR = obj/clzma
 DEFINES += -DNDEBUG
 INCLUDES +=
 FORCE_INCLUDE +=
