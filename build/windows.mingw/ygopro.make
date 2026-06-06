@@ -27,10 +27,10 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
-ifndef $(origin STRIP)
+ifndef STRIP
   STRIP = strip
 endif
-ifndef $(origin RESCOMP)
+ifndef RESCOMP
   RESCOMP = windres
 endif
 TARGETDIR = bin

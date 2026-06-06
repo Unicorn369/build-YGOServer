@@ -29,7 +29,9 @@ namespace irr {
 #include <thread>
 #include <chrono>
 #ifdef _WIN32
+#ifndef __MINGW32__
 #include <timeapi.h>
+#endif
 #endif
 
 #if defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2) || \
