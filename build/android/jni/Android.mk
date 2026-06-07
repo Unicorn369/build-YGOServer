@@ -1,5 +1,6 @@
 LOCAL_PATH := $(call my-dir)/../../..
 #################################
+# ndk-build USR_SHARED=false
 #USR_SHARED ?= false
 USR_SHARED ?= true
 #################################
@@ -27,7 +28,6 @@ LOCAL_SRC_FILES := \
     \
     gframe/spmemvfs/spmemvfs.c \
     \
-    gframe/gframe.cpp \
     gframe/game.cpp \
     gframe/deck_manager.cpp \
     gframe/data_manager.cpp \
@@ -40,12 +40,12 @@ LOCAL_STATIC_LIBRARIES += irrlicht
 LOCAL_STATIC_LIBRARIES += libevent2_core
 
 ifeq ($(USR_SHARED),false)
-    LOCAL_STATIC_LIBRARIES += libocgcore
-    LOCAL_STATIC_LIBRARIES += libsqlite3
+    LOCAL_SRC_FILES += gframe/gframe.cpp
+    LOCAL_STATIC_LIBRARIES += libocgcore libsqlite3
 else
+    LOCAL_SRC_FILES += gframe/ocgcore_proxy.cpp gframe/ocgcore_proxy_init.cpp
     LOCAL_LDFLAGS := @jni/LDFLAGS.txt
-    LOCAL_SHARED_LIBRARIES += libocgcore
-    LOCAL_SHARED_LIBRARIES += libsqlite3
+    LOCAL_SHARED_LIBRARIES += libocgcore libsqlite3
 endif
 
 include $(BUILD_EXECUTABLE)

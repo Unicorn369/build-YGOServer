@@ -116,10 +116,16 @@ static LibHandle ocgcore_handle = nullptr;
 // ==============================================================
 EXTERN_C void init_dynamic_ocgcore() {
     std::string exe_dir = get_executable_dir();
+    std::string lib_ocgcore_path = "./updates/" + std::string(LIB_FILE_NAME);
+
+    const char* env_ocgcore_path = getenv("LIB_OCGCORE_PATH");
+    if (env_ocgcore_path) {
+        lib_ocgcore_path = env_ocgcore_path;
+    }
 
     std::string candidate_paths[] = {
-        // 检查当前工作目录 
-        "./updates/" + std::string(LIB_FILE_NAME),
+        // 自定义路径
+        lib_ocgcore_path,
 #ifdef _WIN32
         "./YGOPro2_Data/Plugins/" + std::string(LIB_FILE_NAME),
 #elif __APPLE__
@@ -137,19 +143,19 @@ EXTERN_C void init_dynamic_ocgcore() {
     for (const std::string& path : candidate_paths) {
         if (ACCESS(path.c_str(), F_OK) == 0) {
             path_to_load = path;
-            //std::cout << "[OCG Proxy] Found library at: " << path_to_load << std::endl;
+            //std::cout << "[YGOPro] Found library at: " << path_to_load << std::endl;
             break;
         }
     }
 
     if (path_to_load.empty()) {
-        std::cerr << "[OCG Proxy] FATAL: Cannot find any ocgcore library in CWD or Executable dir!" << std::endl;
+        std::cerr << "[YGOPro] FATAL: Cannot find any " << LIB_FILE_NAME << " in CWD or Executable dir!" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     ocgcore_handle = LOAD_LIB(path_to_load.c_str());
     if (!ocgcore_handle) {
-        std::cerr << "[OCG Proxy] FATAL: Failed to load library!" << std::endl;
+        std::cerr << "[YGOPro] FATAL: Failed to load " << LIB_FILE_NAME << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -206,5 +212,5 @@ OCGCORE_API byte* default_script_reader(const char* script_name, int* len) { ret
 //+ extern "C" void init_dynamic_ocgcore();
 //
 // int main(int argc, char* argv[]) {
-//+	init_dynamic_ocgcore();
+//+    init_dynamic_ocgcore();
 //
