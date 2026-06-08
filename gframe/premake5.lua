@@ -1,8 +1,3 @@
-include "lzma/."
-if (SERVER_ZIP_SUPPORT or not SERVER_MODE) then
-include "spmemvfs/."
-end
-
 project "ygopro"
 if SERVER_MODE_DLL then
     kind "SharedLib"
@@ -22,11 +17,11 @@ end
     if SERVER_MODE_DLL then
         files { "serverapi.cpp", "serverapi.h"}
     end
-    includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "lua", "sqlite3", "event" }
+    includedirs { "../ocgcore", "../lzma/src/liblzma/api" }
+    links { "ocgcore", "lzma", "lua", "sqlite3", "event" }
     if SERVER_ZIP_SUPPORT then
         defines { "SERVER_ZIP_SUPPORT" }
-        links { "irrlicht", "cspmemvfs", "z" }
+        links { "irrlicht", "zlib" }
         if BUILD_IRRLICHT then
             includedirs { "../irrlicht/source/Irrlicht" }
         end

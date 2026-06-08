@@ -1,8 +1,10 @@
 -- default global settings
 BUILD_LUA = true
+BUILD_LZMA = true
 BUILD_EVENT = true
 BUILD_SQLITE = true
 BUILD_IRRLICHT = true
+BUILD_ZLIB = true
 SERVER_MODE = true
 SERVER_PRO2_SUPPORT = true
 SERVER_ZIP_SUPPORT = true
@@ -74,3 +76,5 @@ workspace "YGOPro"
     include "libevent"
     include "lua"
     include "sqlite3"
+    include "lzma"
+    include "zlib"

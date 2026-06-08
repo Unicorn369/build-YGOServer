@@ -7,6 +7,7 @@ project "irrlicht"
         "_IRR_STATIC_LIB_",
         "NO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_",
         "NO_IRR_COMPILE_WITH_BZIP2_",
+        "NO_IRR_COMPILE_WITH_LZMA_",
         "NO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_",
         "NO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_",
         "NO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_",
@@ -31,16 +32,5 @@ project "irrlicht"
         "source/Irrlicht/CZipReader.cpp"
     }
 
-    filter { "net system:windows" }
-        defines { "NO_IRR_USE_NON_SYSTEM_ZLIB_" }
-
-    filter { "system:windows" }
-        includedirs { "source/Irrlicht/zlib" }
-        files {
-            "source/Irrlicht/zlib/adler32.c",
-            "source/Irrlicht/zlib/crc32.c",
-            "source/Irrlicht/zlib/inffast.c",
-            "source/Irrlicht/zlib/inflate.c",
-            "source/Irrlicht/zlib/inftrees.c",
-            "source/Irrlicht/zlib/zutil.c"
-        }
+    filter { "system:macosx" }
+        cppdialect "gnu++14"
