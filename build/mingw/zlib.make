@@ -29,13 +29,13 @@ ifeq ($(origin AR), default)
 endif
 RESCOMP = windres
 TARGETDIR = bin
-TARGET = $(TARGETDIR)/clzma.lib
-OBJDIR = obj/clzma
+TARGET = $(TARGETDIR)/zlib.lib
+OBJDIR = obj/zlib
 DEFINES += -DWINVER=0x0601 -DNDEBUG
 INCLUDES +=
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -std=c11 -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
 LIBS +=
@@ -59,16 +59,26 @@ endef
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/Alloc.o
-GENERATED += $(OBJDIR)/LzFind.o
-GENERATED += $(OBJDIR)/LzmaDec.o
-GENERATED += $(OBJDIR)/LzmaEnc.o
-GENERATED += $(OBJDIR)/LzmaLib.o
-OBJECTS += $(OBJDIR)/Alloc.o
-OBJECTS += $(OBJDIR)/LzFind.o
-OBJECTS += $(OBJDIR)/LzmaDec.o
-OBJECTS += $(OBJDIR)/LzmaEnc.o
-OBJECTS += $(OBJDIR)/LzmaLib.o
+GENERATED += $(OBJDIR)/adler32.o
+GENERATED += $(OBJDIR)/compress.o
+GENERATED += $(OBJDIR)/crc32.o
+GENERATED += $(OBJDIR)/deflate.o
+GENERATED += $(OBJDIR)/inffast.o
+GENERATED += $(OBJDIR)/inflate.o
+GENERATED += $(OBJDIR)/inftrees.o
+GENERATED += $(OBJDIR)/trees.o
+GENERATED += $(OBJDIR)/uncompr.o
+GENERATED += $(OBJDIR)/zutil.o
+OBJECTS += $(OBJDIR)/adler32.o
+OBJECTS += $(OBJDIR)/compress.o
+OBJECTS += $(OBJDIR)/crc32.o
+OBJECTS += $(OBJDIR)/deflate.o
+OBJECTS += $(OBJDIR)/inffast.o
+OBJECTS += $(OBJDIR)/inflate.o
+OBJECTS += $(OBJDIR)/inftrees.o
+OBJECTS += $(OBJDIR)/trees.o
+OBJECTS += $(OBJDIR)/uncompr.o
+OBJECTS += $(OBJDIR)/zutil.o
 
 # Rules
 # #############################################
@@ -78,7 +88,7 @@ all: $(TARGET)
 
 $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking clzma
+	@echo Linking zlib
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -99,14 +109,14 @@ else
 endif
 
 clean:
-	@echo Cleaning clzma
+	@echo Cleaning zlib
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)
 	$(SILENT) rm -rf $(OBJDIR)
 else
 	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
-	$(SILENT) if exist $(subst /,\\,$(GENERATED)) del /s /q $(subst /,\\,$(GENERATED))
+	$(SILENT) $(foreach f,$(subst /,\\,$(GENERATED)),if exist $(f) del /s /q $(f) >nul &)
 	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
 endif
 
@@ -132,19 +142,34 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/Alloc.o: ../../gframe/lzma/Alloc.c
+$(OBJDIR)/adler32.o: ../../zlib/adler32.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/LzFind.o: ../../gframe/lzma/LzFind.c
+$(OBJDIR)/compress.o: ../../zlib/compress.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/LzmaDec.o: ../../gframe/lzma/LzmaDec.c
+$(OBJDIR)/crc32.o: ../../zlib/crc32.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/LzmaEnc.o: ../../gframe/lzma/LzmaEnc.c
+$(OBJDIR)/deflate.o: ../../zlib/deflate.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/LzmaLib.o: ../../gframe/lzma/LzmaLib.c
+$(OBJDIR)/inffast.o: ../../zlib/inffast.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/inflate.o: ../../zlib/inflate.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/inftrees.o: ../../zlib/inftrees.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/trees.o: ../../zlib/trees.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/uncompr.o: ../../zlib/uncompr.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/zutil.o: ../../zlib/zutil.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

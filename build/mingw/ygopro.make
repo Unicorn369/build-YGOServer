@@ -37,14 +37,14 @@ TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.exe
 OBJDIR = obj/ygopro
 DEFINES += -DWINVER=0x0601 -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/Win32 -I../../irrlicht/include -I../../sqlite3
+INCLUDES += -I../../ocgcore -I../../lzma/src/liblzma/api -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/Win32 -I../../irrlicht/include -I../../sqlite3
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += bin/ocgcore.lib bin/clzma.lib bin/lua.lib bin/sqlite3.lib bin/event.lib bin/irrlicht.lib bin/cspmemvfs.lib -lws2_32
-LDDEPS += bin/ocgcore.lib bin/clzma.lib bin/lua.lib bin/sqlite3.lib bin/event.lib bin/irrlicht.lib bin/cspmemvfs.lib
+LIBS += bin/ocgcore.lib bin/lzma.lib bin/lua.lib bin/sqlite3.lib bin/event.lib bin/irrlicht.lib bin/zlib.lib -lws2_32
+LDDEPS += bin/ocgcore.lib bin/lzma.lib bin/lua.lib bin/sqlite3.lib bin/event.lib bin/irrlicht.lib bin/zlib.lib
 ALL_LDFLAGS += $(LDFLAGS)
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
