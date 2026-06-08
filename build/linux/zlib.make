@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/libzlib.a
-OBJDIR = obj/Release/zlib
+OBJDIR = obj/zlib
 DEFINES += -DNDEBUG
 INCLUDES +=
 FORCE_INCLUDE +=

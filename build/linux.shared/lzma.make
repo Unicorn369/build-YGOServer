@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/liblzma.a
-OBJDIR = obj/Release/lzma
+OBJDIR = obj/lzma
 DEFINES += -DNDEBUG -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDBOOL_H=1 -DHAVE_STRING_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STDIO_H=1 -DHAVE_CHECK_CRC32=1 -DHAVE_ENCODERS=1 -DHAVE_ENCODER_LZMA1=1 -DHAVE_DECODERS=1 -DHAVE_DECODER_LZMA1=1 -DHAVE_MF_HC3=1 -DHAVE_MF_HC4=1 -DHAVE_MF_BT2=1 -DHAVE_MF_BT3=1 -DHAVE_MF_BT4=1 -DHAVE_VISIBILITY=0
 INCLUDES += -I../../lzma/src/common -I../../lzma/src/liblzma/api -I../../lzma/src/liblzma/common -I../../lzma/src/liblzma/check -I../../lzma/src/liblzma/lzma -I../../lzma/src/liblzma/lz -I../../lzma/src/liblzma/rangecoder -I../../lzma/src/liblzma/simple -I../../lzma/src/liblzma/delta
 FORCE_INCLUDE +=
