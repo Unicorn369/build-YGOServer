@@ -41,14 +41,14 @@ TARGETDIR = bin
 TARGET = $(TARGETDIR)/AI.Server.linux
 OBJDIR = obj/ygopro
 DEFINES += -DNDEBUG -DYGOPRO_SERVER_MODE -DSERVER_ZIP_SUPPORT -DSERVER_PRO2_SUPPORT
-INCLUDES += -I../../ocgcore -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/linux -I../../irrlicht/include -I../../sqlite3
+INCLUDES += -I../../ocgcore -I../../lzma/src/liblzma/api -I../../irrlicht/source/Irrlicht -I../../libevent/include -I../../libevent/linux -I../../irrlicht/include -I../../sqlite3
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security -std=c++14 -fno-rtti
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += bin/libclzma.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a -ldl -lpthread
-LDDEPS += bin/libclzma.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libcspmemvfs.a
+LIBS += bin/liblzma.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libzlib.a -ldl -lpthread
+LDDEPS += bin/liblzma.a bin/libsqlite3.a bin/libevent.a bin/libirrlicht.a bin/libzlib.a
 ALL_LDFLAGS += $(LDFLAGS)
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS

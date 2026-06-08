@@ -31,8 +31,8 @@ RESCOMP = windres
 TARGETDIR = bin
 TARGET = $(TARGETDIR)/libirrlicht.a
 OBJDIR = obj/irrlicht
-DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht -I../../irrlicht/source/Irrlicht/zlib
+DEFINES += -DNDEBUG -D_IRR_STATIC_LIB_ -DNO_IRR_COMPILE_WITH_ZIP_ENCRYPTION_ -DNO_IRR_COMPILE_WITH_BZIP2_ -DNO_IRR_COMPILE_WITH_LZMA_ -DNO__IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_ -DNO__IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
+INCLUDES += -I../../irrlicht/include -I../../irrlicht/source/Irrlicht
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -U_FORTIFY_SOURCE -fno-strict-aliasing -Wno-multichar -Wno-format-security
@@ -69,13 +69,7 @@ GENERATED += $(OBJDIR)/CWriteFile.o
 GENERATED += $(OBJDIR)/CXMLReader.o
 GENERATED += $(OBJDIR)/CXMLWriter.o
 GENERATED += $(OBJDIR)/CZipReader.o
-GENERATED += $(OBJDIR)/adler32.o
-GENERATED += $(OBJDIR)/crc32.o
-GENERATED += $(OBJDIR)/inffast.o
-GENERATED += $(OBJDIR)/inflate.o
-GENERATED += $(OBJDIR)/inftrees.o
 GENERATED += $(OBJDIR)/os.o
-GENERATED += $(OBJDIR)/zutil.o
 OBJECTS += $(OBJDIR)/CAttributes.o
 OBJECTS += $(OBJDIR)/CFileList.o
 OBJECTS += $(OBJDIR)/CFileSystem.o
@@ -86,13 +80,7 @@ OBJECTS += $(OBJDIR)/CWriteFile.o
 OBJECTS += $(OBJDIR)/CXMLReader.o
 OBJECTS += $(OBJDIR)/CXMLWriter.o
 OBJECTS += $(OBJDIR)/CZipReader.o
-OBJECTS += $(OBJDIR)/adler32.o
-OBJECTS += $(OBJDIR)/crc32.o
-OBJECTS += $(OBJDIR)/inffast.o
-OBJECTS += $(OBJDIR)/inflate.o
-OBJECTS += $(OBJDIR)/inftrees.o
 OBJECTS += $(OBJDIR)/os.o
-OBJECTS += $(OBJDIR)/zutil.o
 
 # Rules
 # #############################################
@@ -189,24 +177,6 @@ $(OBJDIR)/CZipReader.o: ../../irrlicht/source/Irrlicht/CZipReader.cpp
 $(OBJDIR)/os.o: ../../irrlicht/source/Irrlicht/os.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/adler32.o: ../../irrlicht/source/Irrlicht/zlib/adler32.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/crc32.o: ../../irrlicht/source/Irrlicht/zlib/crc32.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inffast.o: ../../irrlicht/source/Irrlicht/zlib/inffast.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inflate.o: ../../irrlicht/source/Irrlicht/zlib/inflate.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/inftrees.o: ../../irrlicht/source/Irrlicht/zlib/inftrees.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/zutil.o: ../../irrlicht/source/Irrlicht/zlib/zutil.c
-	@echo "$(notdir $<)"
-	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
