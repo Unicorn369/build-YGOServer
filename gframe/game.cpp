@@ -29,7 +29,9 @@ namespace irr {
 #include <thread>
 #include <chrono>
 #ifdef _WIN32
+#ifndef __MINGW32__
 #include <timeapi.h>
+#endif
 #endif
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>

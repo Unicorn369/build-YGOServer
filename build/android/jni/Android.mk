@@ -20,14 +20,6 @@ LOCAL_MODULE_FILENAME := "libYGOPro.so"
 #endif
 
 LOCAL_SRC_FILES := \
-    gframe/lzma/Alloc.c \
-    gframe/lzma/LzFind.c \
-    gframe/lzma/LzmaDec.c \
-    gframe/lzma/LzmaEnc.c \
-    gframe/lzma/LzmaLib.c \
-    \
-    gframe/spmemvfs/spmemvfs.c \
-    \
     gframe/game.cpp \
     gframe/deck_manager.cpp \
     gframe/data_manager.cpp \
@@ -38,6 +30,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES += irrlicht
 LOCAL_STATIC_LIBRARIES += libevent2_core
+LOCAL_STATIC_LIBRARIES += lzma
 
 ifeq ($(USR_SHARED),false)
     LOCAL_SRC_FILES += gframe/gframe.cpp
@@ -53,5 +46,6 @@ include $(BUILD_EXECUTABLE)
 $(call import-add-path,$(LOCAL_PATH))
 $(call import-module,irrlicht)
 $(call import-module,libevent)
+$(call import-module,lzma)
 $(call import-module,ocgcore)
 $(call import-module,sqlite3)
