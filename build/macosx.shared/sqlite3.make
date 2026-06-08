@@ -35,7 +35,7 @@ DEFINES += -DNDEBUG -DSQLITE_DQS=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_MAX_EXP
 INCLUDES +=
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -std=c11 -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O3 -g -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O3 -g -arch x86_64 -arch arm64 -fno-strict-aliasing -Wno-multichar -Wno-format-security
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
 LIBS +=
