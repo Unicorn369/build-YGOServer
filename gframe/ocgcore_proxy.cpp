@@ -124,14 +124,16 @@ EXTERN_C void init_dynamic_ocgcore() {
     }
 
     std::string candidate_paths[] = {
-        // 自定义路径
-        lib_ocgcore_path,
+        lib_ocgcore_path, // 自定义路径
 #ifdef _WIN32
-        "./YGOPro2_Data/Plugins/" + std::string(LIB_FILE_NAME),
+        "./YGOPro2_Data/Plugins/" + std::string(LIB_FILE_NAME),        // 程序路径
+        "./Assets/Plugins/x86/" + std::string(LIB_FILE_NAME),          // Unity编译器
 #elif __APPLE__
-        "./YGOPro2.app/Contents/Plugins/" + std::string(LIB_FILE_NAME),
+        "./YGOPro2.app/Contents/Plugins/" + std::string(LIB_FILE_NAME),// 程序路径
+        "./Assets/Plugins/MacOS/" + std::string(LIB_FILE_NAME),        // Unity编译器
 #elif __LINUX__
-        "./YGOPro2_Data/Plugins/x86_64/" + std::string(LIB_FILE_NAME),
+        "./YGOPro2_Data/Plugins/x86_64/" + std::string(LIB_FILE_NAME), //程序路径
+        "./Assets/Plugins/Linux/" + std::string(LIB_FILE_NAME),        //Unity编译器
 #endif
         // 检查可执行文件所在目录
         exe_dir + "/" + LIB_FILE_NAME
