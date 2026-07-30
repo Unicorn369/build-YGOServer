@@ -23,6 +23,7 @@ LOCAL_SRC_FILES := \
     gframe/game.cpp \
     gframe/deck_manager.cpp \
     gframe/data_manager.cpp \
+    gframe/file_system.cpp \
     gframe/replay.cpp \
     gframe/netserver.cpp \
     gframe/single_duel.cpp \

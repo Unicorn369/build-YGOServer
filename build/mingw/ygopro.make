@@ -67,6 +67,7 @@ RESOURCES :=
 
 GENERATED += $(OBJDIR)/data_manager.o
 GENERATED += $(OBJDIR)/deck_manager.o
+GENERATED += $(OBJDIR)/file_system.o
 GENERATED += $(OBJDIR)/game.o
 GENERATED += $(OBJDIR)/gframe.o
 GENERATED += $(OBJDIR)/netserver.o
@@ -76,6 +77,7 @@ GENERATED += $(OBJDIR)/tag_duel.o
 GENERATED += $(OBJDIR)/ygopro.res
 OBJECTS += $(OBJDIR)/data_manager.o
 OBJECTS += $(OBJDIR)/deck_manager.o
+OBJECTS += $(OBJDIR)/file_system.o
 OBJECTS += $(OBJDIR)/game.o
 OBJECTS += $(OBJDIR)/gframe.o
 OBJECTS += $(OBJDIR)/netserver.o
@@ -151,6 +153,9 @@ $(OBJDIR)/data_manager.o: ../../gframe/data_manager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/deck_manager.o: ../../gframe/deck_manager.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/file_system.o: ../../gframe/file_system.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/game.o: ../../gframe/game.cpp
