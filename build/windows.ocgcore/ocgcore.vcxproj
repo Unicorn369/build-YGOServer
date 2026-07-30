@@ -198,7 +198,6 @@
     <ClCompile Include="..\..\ocgcore\libduel.cpp" />
     <ClCompile Include="..\..\ocgcore\libeffect.cpp" />
     <ClCompile Include="..\..\ocgcore\libgroup.cpp" />
-    <ClCompile Include="..\..\ocgcore\mem.cpp" />
     <ClCompile Include="..\..\ocgcore\ocgapi.cpp" />
     <ClCompile Include="..\..\ocgcore\operations.cpp" />
     <ClCompile Include="..\..\ocgcore\playerop.cpp" />

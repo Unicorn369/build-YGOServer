@@ -70,7 +70,6 @@ GENERATED += $(OBJDIR)/libdebug.o
 GENERATED += $(OBJDIR)/libduel.o
 GENERATED += $(OBJDIR)/libeffect.o
 GENERATED += $(OBJDIR)/libgroup.o
-GENERATED += $(OBJDIR)/mem.o
 GENERATED += $(OBJDIR)/ocgapi.o
 GENERATED += $(OBJDIR)/operations.o
 GENERATED += $(OBJDIR)/playerop.o
@@ -87,7 +86,6 @@ OBJECTS += $(OBJDIR)/libdebug.o
 OBJECTS += $(OBJDIR)/libduel.o
 OBJECTS += $(OBJDIR)/libeffect.o
 OBJECTS += $(OBJDIR)/libgroup.o
-OBJECTS += $(OBJDIR)/mem.o
 OBJECTS += $(OBJDIR)/ocgapi.o
 OBJECTS += $(OBJDIR)/operations.o
 OBJECTS += $(OBJDIR)/playerop.o
@@ -187,9 +185,6 @@ $(OBJDIR)/libeffect.o: ../../ocgcore/libeffect.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/libgroup.o: ../../ocgcore/libgroup.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/mem.o: ../../ocgcore/mem.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/ocgapi.o: ../../ocgcore/ocgapi.cpp
