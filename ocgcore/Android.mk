@@ -17,7 +17,6 @@ LOCAL_SRC_FILES := \
     libduel.cpp \
     libeffect.cpp \
     libgroup.cpp \
-    mem.cpp \
     ocgapi.cpp \
     operations.cpp \
     playerop.cpp \
