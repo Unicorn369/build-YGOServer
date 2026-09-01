@@ -114,7 +114,7 @@ static LibHandle ocgcore_handle = nullptr;
 // ==============================================================
 // 初始化逻辑：基于程序所在目录动态构建路径
 // ==============================================================
-EXTERN_C void init_dynamic_ocgcore() {
+extern "C" void init_dynamic_ocgcore() {
     std::string exe_dir = get_executable_dir();
     std::string lib_ocgcore_path = "./updates/" + std::string(LIB_FILE_NAME);
 
