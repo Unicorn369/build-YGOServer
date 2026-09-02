@@ -276,7 +276,7 @@ static int mymain(int wargc, const wchar_t* const wargv[]) {
 	return EXIT_SUCCESS;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
 	std::setlocale(LC_CTYPE, ".UTF-8");
